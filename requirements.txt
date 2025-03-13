@@ -1,0 +1,7 @@
+# requirements.txt 생성 후 아래 내용 추가
+Flask==3.0.2
+redis==5.0.1
+celery==5.3.6
+python-dotenv==1.0.1
+prometheus-flask-exporter==0.22.4
+PyJWT==2.8.0
