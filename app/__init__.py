@@ -7,7 +7,9 @@ from .config import Config
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    CORS(app, resources={r"/*": {"origins": Config.CORS_ORIGINS}})
+
+    # CORS 설정
+    CORS(app, resources={r"/*": {"origins": "*"}})  # 모든 도메인 허용 (개발용)
 
     # routes.py에서 Blueprint 임포트 (순서 중요!)
     from .routes import bp  # ✅ 수정된 부분

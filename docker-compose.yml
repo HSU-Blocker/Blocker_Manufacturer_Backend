@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  flask-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" # 호스트 포트 5000을 컨테이너 포트 5000에 매핑
+    volumes:
+      - .:/app # 호스트 디렉토리를 컨테이너의 /app에 마운트
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=run.py
+    command: python run.py

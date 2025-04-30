@@ -5,6 +5,11 @@ from .services.blockchain_service import BlockchainService
 bp = Blueprint('main', __name__)  # ✅ 변경된 부분
 blockchain = BlockchainService()
 
+# 테스트 엔드포인트 추가
+@bp.route('/test', methods=['GET'])
+def test_endpoint():
+    return jsonify({"message": "hello"}), 200
+
 
 # 프론트엔드와 엔드포인트 일치시키기
 @bp.route('/api/blockchain/upload', methods=['POST'])
