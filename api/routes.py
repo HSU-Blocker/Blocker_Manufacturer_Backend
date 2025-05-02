@@ -62,7 +62,7 @@ def upload_software_update():
             os.path.dirname(__file__), "../iot_device/client/keys"
         )
         user_attributes = ["ABC123", "SN12345"]
-        key_dir = os.path.join(os.path.dirname(__file__), "../keys")
+        key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
         cache_file = os.path.join(os.path.dirname(__file__), "../update_cache.json")
         result = UpdateService.process_update_upload(
             file,
@@ -108,7 +108,9 @@ def list_updates():
     try:
         # 캐시 파일 사용 제거, 블록체인에서 직접 조회
         notifier = BlockchainNotifier()
-        updates = notifier.get_all_updates()  # contract.py에 get_all_updates 함수가 있다고 가정
+        updates = (
+            notifier.get_all_updates()
+        )  # contract.py에 get_all_updates 함수가 있다고 가정
         return jsonify({"updates": updates})
     except Exception as e:
         return jsonify({"error": str(e), "updates": []}), 500

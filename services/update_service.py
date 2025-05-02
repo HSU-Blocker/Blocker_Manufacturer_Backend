@@ -49,7 +49,7 @@ class UpdateService:
         file_hash = HashTools.sha3_hash_file(encrypted_file_path)
         ipfs_uploader = IPFSUploader()
         ipfs_hash = ipfs_uploader.upload_file(encrypted_file_path)
-        os.makedirs(key_dir, exist_ok=True)
+        key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
         public_key_file = os.path.join(key_dir, "public_key.bin")
         master_key_file = os.path.join(key_dir, "master_key.bin")
         device_secret_key_file = os.path.join(

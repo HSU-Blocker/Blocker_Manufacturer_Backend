@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  manufacturer-backend:
+    build: .
+    container_name: blocker_manufacturer_backend
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./crypto/keys:/app/crypto/keys
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
