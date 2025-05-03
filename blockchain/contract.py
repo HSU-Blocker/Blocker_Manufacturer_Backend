@@ -1,7 +1,58 @@
+import json
+import os
+from web3 import Web3
+
 # 블록체인 스마트컨트랙트 연동 모듈 (예시)
 
-
 class BlockchainNotifier:
+    def __init__(self, provider_url=None, registry_info_path=None, update_abi_path=None, account_address=None, private_key=None):
+        # provider_url 기본값
+        if provider_url is None:
+            provider_url = os.environ.get("BLOCKCHAIN_PROVIDER", "http://localhost:8545")
+        self.web3 = Web3(Web3.HTTPProvider(provider_url))
+        # AddressRegistry 정보 경로
+        if registry_info_path is None:
+            registry_info_path = os.path.join(os.path.dirname(__file__), "registry_address.txt")
+        # SoftwareUpdateContract ABI 경로
+        if update_abi_path is None:
+            update_abi_path = os.path.join(os.path.dirname(__file__), "SoftwareUpdateContract.abi.json")
+        # AddressRegistry 주소/ABI 로드
+        with open(registry_info_path, "r") as f:
+            reg_info = json.load(f)
+        registry_address = reg_info["address"]
+        registry_abi = reg_info["abi"]
+        registry_contract = self.web3.eth.contract(address=registry_address, abi=registry_abi)
+        # SoftwareUpdateContract 주소 동적 조회
+        update_address = registry_contract.functions.getContractAddress("SoftwareUpdateContract").call()
+        # SoftwareUpdateContract ABI 로드
+        with open(update_abi_path, "r") as f:
+            update_abi = json.load(f)
+        self.contract = self.web3.eth.contract(address=update_address, abi=update_abi)
+        self.account_address = account_address or os.environ.get("BLOCKCHAIN_ACCOUNT")
+        self.private_key = private_key or os.environ.get("BLOCKCHAIN_PRIVATE_KEY")
+
+    def register_update(self, uid, ipfs_hash, encrypted_key, hash_of_update, description, price, version, signature):
+        # 트랜잭션 데이터 준비
+        tx = self.contract.functions.registerUpdate(
+            uid,
+            ipfs_hash,
+            encrypted_key,
+            hash_of_update,
+            description,
+            int(price),
+            version,
+            signature
+        ).build_transaction({
+            'from': self.account_address,
+            'nonce': self.web3.eth.get_transaction_count(self.account_address),
+            'gas': 500000,
+            'gasPrice': self.web3.to_wei('10', 'gwei')
+        })
+        # 서명 및 전송
+        signed_tx = self.web3.eth.account.sign_transaction(tx, private_key=self.private_key)
+        tx_hash = self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        return tx_hash
+
     def get_all_updates(self):
         """
         블록체인 SoftwareUpdateContract에서 전체 업데이트 목록을 조회하여 반환합니다.
