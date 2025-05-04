@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class IPFSUploader:
     """IPFS에 실제 파일을 업로드하고 DHT 등록 및 핀 처리를 수행하는 클래스"""
 
-    def __init__(self, ipfs_api="/ip4/127.0.0.1/tcp/5001"):
+    def __init__(self, ipfs_api="/dns4/ipfs/tcp/5001/http"):
         """IPFS 클라이언트 초기화 (실제 노드 연결)"""
         try:
             self.client = ipfshttpclient.connect(ipfs_api)

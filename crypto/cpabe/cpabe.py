@@ -96,7 +96,7 @@ class CPABETools:
             logger.error(f"CP-ABE 복호화 실패: {e}")
             return None
 
-    def generate_device_secret_key(self, public_key_file, master_key_file, attributes, device_secret_key_file):
+    def generate_device_secret_key(self, public_key_file, master_key_file, attributes):
         try:
             with open(public_key_file, "r") as f:
                 serialized_pk = json.load(f)
@@ -120,11 +120,7 @@ class CPABETools:
 
             serialized_key = serialize_element(device_secret_key)
 
-            os.makedirs(os.path.dirname(device_secret_key_file), exist_ok=True)
-            with open(device_secret_key_file, "wb") as f:
-                pickle.dump(serialized_key, f)
-
-            return device_secret_key
+            return serialized_key
         except Exception as e:
             logger.error(f"device secret key 생성 실패: {e}")
             return None

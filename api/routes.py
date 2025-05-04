@@ -23,13 +23,13 @@ api.add_namespace(manufacturer_ns, path="/manufacturer")
 upload_parser = reqparse.RequestParser()
 upload_parser.add_argument("file", location="files", type='file', required=True, help="업로드할 소프트웨어 파일")
 
-# 폼 데이터 모델 정의
-upload_metadata_model = manufacturer_ns.model("UploadMetadata", {
-    "version": fields.String(description="업데이트 버전"),
-    "description": fields.String(description="업데이트 설명"),
-    "price": fields.String(description="가격(ETH)"),
-    "policy": fields.String(description="속성 정책 (JSON 문자열)")
-})
+# 파일 + 폼 필드 파서 정의
+upload_parser = reqparse.RequestParser()
+upload_parser.add_argument("file", location="files", type='file', required=True, help="업로드할 소프트웨어 파일")
+upload_parser.add_argument("version", location="form", type=str, required=False, help="업데이트 버전")
+upload_parser.add_argument("description", location="form", type=str, required=False, help="업데이트 설명")
+upload_parser.add_argument("price", location="form", type=str, required=False, help="가격(ETH)")
+upload_parser.add_argument("policy", location="form", type=str, required=False, help='속성 정책 (예: {"model": "K4", "serial": "123456"})')
 
 # 업로드 응답 모델 정의
 upload_response_model = manufacturer_ns.model("UploadResponse", {
@@ -50,7 +50,7 @@ def build_attribute_policy(policy_dict):
 # ✅ 소프트웨어 업로드 API
 @manufacturer_ns.route("/upload")
 class SoftwareUpload(Resource):
-    @manufacturer_ns.expect(upload_parser, upload_metadata_model)
+    @manufacturer_ns.expect(upload_parser)  # ✅ metadata model 제거
     @manufacturer_ns.response(200, "업로드 성공", upload_response_model)
     @manufacturer_ns.doc(description="소프트웨어 업데이트 업로드 API")
     def post(self):
@@ -64,7 +64,7 @@ class SoftwareUpload(Resource):
             description = request.form.get("description", "")
             price_eth = request.form.get("price", "0")
             policy_dict = json.loads(request.form.get("policy", "{}"))
-
+            
             # 업로드 경로는 필요시 직접 지정, 디바이스 비밀키 경로/속성 예시는 제거
             upload_folder = os.path.join(os.path.dirname(__file__), "../uploads")
             key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
@@ -77,8 +77,6 @@ class SoftwareUpload(Resource):
                 price_eth,
                 policy_dict,
                 upload_folder,
-                None,  # device_secret_key_folder는 더이상 사용하지 않음
-                None,  # user_attributes도 사용하지 않음
                 key_dir,
                 cache_file,
             )

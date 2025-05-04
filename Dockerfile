@@ -15,10 +15,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libtool \
     python3-dev \
     openssl \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # 작업 디렉토리 설정
 WORKDIR /app
+
+# IPFS CLI 설치
+RUN wget https://dist.ipfs.tech/kubo/v0.25.0/kubo_v0.25.0_linux-amd64.tar.gz && \
+    tar -xvzf kubo_v0.25.0_linux-amd64.tar.gz && \
+    cp kubo/ipfs /usr/local/bin/ipfs && \
+    chmod +x /usr/local/bin/ipfs && \
+    rm -rf kubo*  # 정리
 
 # PBC 라이브러리 설치 (기본 제공 GMP 사용)
 RUN wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz && \
@@ -51,8 +59,6 @@ RUN pip install --upgrade pip && \
     pip install regex>=2022.3.15 && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install pycryptodome>=3.14.1 cryptography>=36.0.0
-
-RUN pip install --no-cache-dir -r requirements.txt
 
 # solc 설치
 RUN pip install py-solc-x

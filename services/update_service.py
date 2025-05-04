@@ -3,6 +3,7 @@ import json
 import uuid
 import base64
 import logging
+from flask import jsonify
 from werkzeug.utils import secure_filename
 from crypto.symmetric.symmetric import SymmetricCrypto
 from crypto.hash.hash import HashTools
@@ -29,8 +30,6 @@ class UpdateService:
         price_eth,
         policy_dict,
         upload_folder,
-        device_secret_key_folder,
-        user_attributes,
         key_dir,
         cache_file=None,
     ):
@@ -66,23 +65,34 @@ class UpdateService:
         # HA-3 해시 생성 hEbj
         file_hash = HashTools.sha3_hash_file(encrypted_file_path)
         
-        # PFS에 암호화된 바이너리 업로드
-        ipfs_uploader = IPFSUploader()
-        ipfs_hash = ipfs_uploader.upload_file(encrypted_file_path)
-        logger.info(f"IPFS 업로드 완료: {ipfs_hash}")
+        # IPFS에 암호화된 바이너리 업로드
+        try:
+            ipfs_uploader = IPFSUploader()
+            ipfs_hash = ipfs_uploader.upload_file(encrypted_file_path)
+            logger.info(f"IPFS 업로드 완료: {ipfs_hash}")
+        except ConnectionError as ce:
+            logger.error(f"IPFS 연결 오류: {ce}")
+            return jsonify({"error": f"IPFS 연결에 실패했습니다.: {e}"}), 500
+        except Exception as e:
+            logger.error(f"IPFS 업로드 중 예외 발생: {e}")
+            return jsonify({"error": f"IPFS 업로드 실패: {e}"}), 500
+            
         
         # CP-ABE 키 생성
         key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
         public_key_file = os.path.join(key_dir, "public_key.bin")
         master_key_file = os.path.join(key_dir, "master_key.bin")
-        device_secret_key_file = os.path.join(
-            device_secret_key_folder, "device_secret_key_file.bin"
-        )
 
+        # policy_dict의 키를 기반으로 user_attributes 생성
+        user_attributes = [v for k, v in policy_dict.items() if v]
+        logger.info(f"추출된 user_attributes: {user_attributes}")
+        
         cpabe.setup(public_key_file, master_key_file)
-        cpabe.generate_device_secret_key(
-            public_key_file, master_key_file, user_attributes, device_secret_key_file
+        serialized_device_secret_key = cpabe.generate_device_secret_key(
+            public_key_file, master_key_file, user_attributes
         )
+        logger.info(f"생성된 serialized_device_secret_key: {serialized_device_secret_key}")
+        
         encrypted_key = cpabe.encrypt(kbj, attribute_policy, public_key_file)
         logger.info(f"CP-ABE로 대칭키 암호화 완료, encrypted_key: {encrypted_key}")
 
@@ -92,7 +102,7 @@ class UpdateService:
         # ECDSA 서명(σ) 생성
         try:
             # PRIVATE_KEY 환경 변수에서 값 읽기
-            eth_private_key = os.getenv("PRIVATE_KEY")
+            eth_private_key = os.getenv("BLOCKCHAIN_PRIVATE_KEY")
             logger.info(f"eth_private_key 길이: {len(eth_private_key)}")  # 66
 
             # 개인키로 서명할 때 사용한 address
@@ -109,7 +119,7 @@ class UpdateService:
             signature = ECDSATools.sign_message(
                 update_uid, ipfs_hash, encrypted_key, file_hash, eth_private_key
             ) 
-            logger.debug(f"ECDSA 서명 생성 완료: {signature[:20]}...")
+            logger.info(f"ECDSA 서명 생성 완료: {signature[:20]}...")
         except Exception as sign_err:
             logger.error(f"서명 생성 실패: {sign_err}")
             return jsonify({"error": f"서명 생성에 실패했습니다: {sign_err}"}), 500
