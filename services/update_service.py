@@ -52,7 +52,9 @@ class UpdateService:
         key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
         public_key_file = os.path.join(key_dir, "public_key.bin")
         master_key_file = os.path.join(key_dir, "master_key.bin")
-        cpabe.setup(public_key_file, master_key_file)
+        # 이미 키 파일이 있으면 setup을 건너뜀
+        if not (os.path.exists(public_key_file) and os.path.exists(master_key_file)):
+            cpabe.setup(public_key_file, master_key_file)
         encrypted_key = cpabe.encrypt(kbj, attribute_policy, public_key_file)
         if not encrypted_key:
             raise Exception("CP-ABE 암호화 실패: encrypted_key가 None입니다.")

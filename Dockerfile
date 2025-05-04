@@ -49,4 +49,4 @@ RUN git clone https://github.com/JHUISI/charm.git /tmp/charm && \
 # 프로젝트 전체 복사
 COPY . .
 
-CMD ["python", "main.py"]
+CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:5002"]

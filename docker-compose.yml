@@ -5,7 +5,7 @@ services:
     build: .
     container_name: blocker_manufacturer_backend
     ports:
-      - "5001:5001"
+      - "5002:5002"
     volumes:
       - ./crypto/keys:/app/crypto/keys
     environment:
