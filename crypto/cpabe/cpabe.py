@@ -13,29 +13,25 @@ logging.basicConfig(level=logging.INFO)
 
 class CPABETools:
     def __init__(self):
-        try:
-            self.group = PairingGroup("SS512")
-            self.cpabe = CPabe_BSW07(self.group)
-            self.charm_installed = True
-            logger.info("Charm-crypto 라이브러리 로드 성공. CP-ABE 기능 활성화됨.")
-        except ImportError:
-            self.charm_installed = False
-            logger.warning("Charm-crypto가 설치되지 않았습니다. CP-ABE 모의 구현을 사용합니다.")
+        self.group = PairingGroup("SS512")
+        self.cpabe = CPabe_BSW07(self.group)
+        self.charm_installed = True
+        logger.info("Charm-crypto 라이브러리 로드 성공. CP-ABE 기능 활성화됨.")
 
     def setup(self, public_key_file, master_key_file):
         try:
-            if self.charm_installed:
-                (pk, mk) = self.cpabe.setup()
-                serialized_pk = {k: self.group.serialize(v).decode("latin1") for k, v in pk.items()}
-                serialized_mk = {k: self.group.serialize(v).decode("latin1") for k, v in mk.items()}
+            (pk, mk) = self.cpabe.setup()
+            serialized_pk = {k: self.group.serialize(v).decode("latin1") for k, v in pk.items()}
+            serialized_mk = {k: self.group.serialize(v).decode("latin1") for k, v in mk.items()}
 
-                with open(public_key_file, "w") as f:
-                    json.dump(serialized_pk, f)
-                with open(master_key_file, "w") as f:
-                    json.dump(serialized_mk, f)
+            with open(public_key_file, "w") as f:
+                json.dump(serialized_pk, f)
+            with open(master_key_file, "w") as f:
+                json.dump(serialized_mk, f)
 
             logger.info(f"CP-ABE 키 생성 및 저장 완료")
             return True
+                
         except Exception as e:
             logger.error(f"CP-ABE 시스템 초기화 실패: {e}")
             return False
@@ -130,7 +126,7 @@ class CPABETools:
 
             return device_secret_key
         except Exception as e:
-            logger.error(f"개인 키 생성 실패: {e}")
+            logger.error(f"device secret key 생성 실패: {e}")
             return None
 
     def load_public_key(self, public_key_file):
