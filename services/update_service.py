@@ -20,8 +20,6 @@ class UpdateService:
         price_eth,
         policy_dict,
         upload_folder,
-        device_secret_key_folder,
-        user_attributes,
         key_dir,
         cache_file=None,
     ):
@@ -49,24 +47,39 @@ class UpdateService:
         file_hash = HashTools.sha3_hash_file(encrypted_file_path)
         ipfs_uploader = IPFSUploader()
         ipfs_hash = ipfs_uploader.upload_file(encrypted_file_path)
+        if not ipfs_hash:
+            raise Exception("IPFS 업로드 실패: ipfs_hash가 None입니다.")
         key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
         public_key_file = os.path.join(key_dir, "public_key.bin")
         master_key_file = os.path.join(key_dir, "master_key.bin")
-        device_secret_key_file = os.path.join(
-            device_secret_key_folder, "device_secret_key_file.bin"
-        )
         cpabe.setup(public_key_file, master_key_file)
-        cpabe.generate_device_secret_key(
-            public_key_file, master_key_file, user_attributes, device_secret_key_file
-        )
         encrypted_key = cpabe.encrypt(kbj, attribute_policy, public_key_file)
+        if not encrypted_key:
+            raise Exception("CP-ABE 암호화 실패: encrypted_key가 None입니다.")
         update_uid = f"{original_filename.split('.')[0]}_v{version}"
         ecdsa_private_key_path = os.path.join(key_dir, "ecdsa_private_key.pem")
         ecdsa_public_key_path = os.path.join(key_dir, "ecdsa_public_key.pem")
-        ecdsa_private_key, ecdsa_public_key = ECDSATools.generate_key_pair(
-            ecdsa_private_key_path, ecdsa_public_key_path
+        
+        # 키가 있으면 로드하고, 없으면 생성 (매번 새로 생성하지 않음)
+        if os.path.exists(ecdsa_private_key_path) and os.path.exists(ecdsa_public_key_path):
+            ecdsa_private_key = ECDSATools.load_private_key(ecdsa_private_key_path)
+            ecdsa_public_key = ECDSATools.load_public_key(ecdsa_public_key_path)
+            print("기존 ECDSA 키 로드 완료")
+        else:
+            ecdsa_private_key, ecdsa_public_key = ECDSATools.generate_key_pair(
+                ecdsa_private_key_path, ecdsa_public_key_path
+            )
+            print("새 ECDSA 키 생성 완료")
+        
+        signature_message = (
+            update_uid,
+            ipfs_hash,
+            encrypted_key,
+            file_hash,
+            description,
+            price,
+            version,
         )
-        signature_message = f"{update_uid}:{ipfs_hash}:{encrypted_key}:{file_hash}"
         signature = ECDSATools.sign_message(signature_message, ecdsa_private_key_path)
         notifier = BlockchainNotifier()
         tx_hash = notifier.register_update(

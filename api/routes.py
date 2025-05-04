@@ -35,7 +35,6 @@ def upload_software_update():
         description = request.form.get("description", "")
         price_eth = request.form.get("price", "0")
         policy_dict = json.loads(request.form.get("policy", "{}"))
-        # 업로드 경로는 필요시 직접 지정, 디바이스 비밀키 경로/속성 예시는 제거
         upload_folder = os.path.join(os.path.dirname(__file__), "../uploads")
         key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
         cache_file = os.path.join(os.path.dirname(__file__), "../update_cache.json")
@@ -46,14 +45,14 @@ def upload_software_update():
             price_eth,
             policy_dict,
             upload_folder,
-            None,  # device_secret_key_folder는 더이상 사용하지 않음
-            None,  # user_attributes도 사용하지 않음
             key_dir,
             cache_file,
         )
         return jsonify(result)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import traceback
+        tb = traceback.format_exc()
+        return jsonify({"error": str(e), "traceback": tb}), 500
 
 
 @api_bp.route("/api/manufacturer/updates", methods=["GET"])

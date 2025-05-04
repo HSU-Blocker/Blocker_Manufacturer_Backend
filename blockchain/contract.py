@@ -12,10 +12,10 @@ class BlockchainNotifier:
         self.web3 = Web3(Web3.HTTPProvider(provider_url))
         # AddressRegistry 정보 경로
         if registry_info_path is None:
-            registry_info_path = os.path.join(os.path.dirname(__file__), "registry_address.txt")
+            registry_info_path = os.path.join(os.path.dirname(__file__), "registry_address.json")
         # SoftwareUpdateContract ABI 경로
         if update_abi_path is None:
-            update_abi_path = os.path.join(os.path.dirname(__file__), "SoftwareUpdateContract.abi.json")
+            update_abi_path = os.path.join(os.path.dirname(__file__), "contract_address.json")
         # AddressRegistry 주소/ABI 로드
         with open(registry_info_path, "r") as f:
             reg_info = json.load(f)
@@ -26,7 +26,8 @@ class BlockchainNotifier:
         update_address = registry_contract.functions.getContractAddress("SoftwareUpdateContract").call()
         # SoftwareUpdateContract ABI 로드
         with open(update_abi_path, "r") as f:
-            update_abi = json.load(f)
+            update_abi_json = json.load(f)
+        update_abi = update_abi_json["abi"]
         self.contract = self.web3.eth.contract(address=update_address, abi=update_abi)
         self.account_address = account_address or os.environ.get("BLOCKCHAIN_ACCOUNT")
         self.private_key = private_key or os.environ.get("BLOCKCHAIN_PRIVATE_KEY")
@@ -45,12 +46,12 @@ class BlockchainNotifier:
         ).build_transaction({
             'from': self.account_address,
             'nonce': self.web3.eth.get_transaction_count(self.account_address),
-            'gas': 500000,
-            'gasPrice': self.web3.to_wei('10', 'gwei')
+            'gas': 2000000,  # 가스 한도 증가: 500,000 -> 2,000,000
+            'gasPrice': self.web3.to_wei('20', 'gwei')  # 가스 가격도 증가: 10 -> 20 gwei
         })
         # 서명 및 전송
         signed_tx = self.web3.eth.account.sign_transaction(tx, private_key=self.private_key)
-        tx_hash = self.web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        tx_hash = self.web3.eth.send_raw_transaction(signed_tx.raw_transaction)
         return tx_hash
 
     def get_all_updates(self):
