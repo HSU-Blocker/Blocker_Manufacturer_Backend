@@ -64,20 +64,57 @@ class BlockchainNotifier:
         updates = []
         try:
             update_count = self.contract.functions.getUpdateCount().call()
+            print(f"블록체인에서 조회된 업데이트 수: {update_count}")
+            
             for idx in range(update_count):
-                uid = self.contract.functions.getUpdateIdByIndex(idx).call()
-                info = self.contract.functions.getUpdateInfo(uid).call()
-                # info 구조는 실제 컨트랙트 반환값에 맞게 파싱 필요
-                updates.append(
-                    {
-                        "uid": uid,
-                        "version": info.get("version", ""),
-                        "description": info.get("description", ""),
-                        "ipfs_hash": info.get("ipfsHash", ""),
-                        "price": info.get("price", 0) / 1e18,
-                    }
-                )
+                try:
+                    uid = self.contract.functions.getUpdateIdByIndex(idx).call()
+                    print(f"인덱스 {idx}의 UID: {uid}")
+                    
+                    # 스마트 컨트랙트에서 반환하는 데이터 형식에 맞게 처리
+                    info = self.contract.functions.getUpdateInfo(uid).call()
+                    print(f"UID {uid}의 원본 정보: {info}")
+                    
+                    # 리스트 형식으로 반환되는 경우 (배열 반환)
+                    if isinstance(info, list):
+                        update_info = {
+                            "uid": uid,
+                            "ipfs_hash": info[0] if len(info) > 0 else "",
+                            "description": info[3] if len(info) > 3 else "",
+                            "price": float(info[4]) / 1e18 if len(info) > 4 else 0,
+                            "version": info[5] if len(info) > 5 else ""
+                        }
+                    # 스마트 컨트랙트 반환값이 튜플인 경우(일반적인 Solidity 반환 형태)
+                    elif isinstance(info, tuple):
+                        update_info = {
+                            "uid": uid,
+                            "ipfs_hash": info[0] if len(info) > 0 else "",
+                            "description": info[3] if len(info) > 3 else "",
+                            "price": float(info[4]) / 1e18 if len(info) > 4 else 0,
+                            "version": info[5] if len(info) > 5 else ""
+                        }
+                    # 이미 딕셔너리 형태로 반환되는 경우
+                    elif isinstance(info, dict):
+                        update_info = {
+                            "uid": uid,
+                            "ipfs_hash": info.get("ipfsHash", ""),
+                            "description": info.get("description", ""),
+                            "price": float(info.get("price", 0)) / 1e18,
+                            "version": info.get("version", "")
+                        }
+                    else:
+                        print(f"지원하지 않는 정보 형식: {type(info)}")
+                        continue
+                    
+                    updates.append(update_info)
+                    print(f"처리된 업데이트 정보: {update_info}")
+                    
+                except Exception as e:
+                    print(f"UID {uid} 정보 조회 오류: {str(e)}")
+                    continue
+                
         except Exception as e:
-            # 필요시 로깅
-            pass
+            print(f"업데이트 목록 조회 중 오류 발생: {str(e)}")
+        
+        print(f"최종 반환할 업데이트 수: {len(updates)}")
         return updates
