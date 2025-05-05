@@ -14,6 +14,9 @@ from crypto.ecdsa.ecdsa import ECDSATools
 from eth_account import Account
 import re
 
+from hashlib import sha256
+from charm.core.engine.util import objectToBytes, bytesToObject
+
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -130,7 +133,7 @@ class UpdateService:
             price,
             version,
         )
-        signature = ECDSATools.sign_message(signature_message, ecdsa_private_key_path)  
+        signature = ECDSATools.sign_message(signature_message, ecdsa_private_key_path)
         
         # 블록체인에 등록
         notifier = BlockchainNotifier()
@@ -156,7 +159,7 @@ class UpdateService:
             "kbj": base64.b64encode(cpabe_group.serialize(kbj)).decode(),
             "aes_key": base64.b64encode(aes_key).decode(),
             "encrypted_key": encrypted_key, 
-            "device_secret_key": serialized_device_secret_key,
+            "device_secret_key": UpdateService.make_json_serializable(serialized_device_secret_key, cpabe_group)
         }
     
 
@@ -200,3 +203,16 @@ class UpdateService:
             tokens = [token.strip() for token in expr.split() if token.strip()]
             attributes.extend(tokens)
         return list(set(attributes))  # 중복 제거
+
+    @staticmethod
+    def make_json_serializable(obj, group):
+        if hasattr(obj, "initPP"):  # pairing.Element
+            return base64.b64encode(group.serialize(obj)).decode()
+        elif isinstance(obj, bytes):
+            return base64.b64encode(obj).decode()
+        elif isinstance(obj, list):
+            return [UpdateService.make_json_serializable(e, group) for e in obj]
+        elif isinstance(obj, dict):
+            return {k: UpdateService.make_json_serializable(v, group) for k, v in obj.items()}
+        else:
+            return obj  # str, int 등 기본 타입

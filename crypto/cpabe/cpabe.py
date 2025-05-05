@@ -67,36 +67,6 @@ class CPABETools:
             logger.error(f"CP-ABE 암호화 실패: {e}")
             raise
 
-    def decrypt(self, encrypted_key_json, public_key, device_secret_key):
-        try:
-            if isinstance(encrypted_key_json, str):
-                encrypted_data = json.loads(encrypted_key_json)
-            else:
-                encrypted_data = encrypted_key_json
-
-            def deserialize_element(obj):
-                if isinstance(obj, str):
-                    try:
-                        return self.group.deserialize(b64decode(obj))
-                    except:
-                        return obj
-                elif isinstance(obj, list):
-                    return [deserialize_element(e) for e in obj]
-                elif isinstance(obj, dict):
-                    return {k: deserialize_element(v) for k, v in obj.items()}
-                else:
-                    return obj
-
-            deserialized = deserialize_element(encrypted_data)
-            decrypted_result = self.cpabe.decrypt(public_key, device_secret_key, deserialized)
-            if isinstance(decrypted_result, bool):
-                logger.error("접근 정책이 충족되지 않음")
-                return None
-            return decrypted_result
-        except Exception as e:
-            logger.error(f"CP-ABE 복호화 실패: {e}")
-            return None
-
     def generate_device_secret_key(self, public_key_file, master_key_file, attributes, device_secret_key_file):
         try:
             with open(public_key_file, "r") as f:
@@ -109,25 +79,23 @@ class CPABETools:
 
             device_secret_key = self.cpabe.keygen(pk, mk, attributes)
 
-            def serialize_cpabe_object(obj, group):
-                if hasattr(obj, "initPP"):  # pairing.Element인 경우
-                    return base64.b64encode(group.serialize(obj)).decode()
-                elif isinstance(obj, bytes):
-                    return base64.b64encode(obj).decode()
-                elif isinstance(obj, dict):
-                    return {k: serialize_cpabe_object(v, group) for k, v in obj.items()}
+            def serialize_element(obj):
+                if hasattr(obj, "initPP"):
+                    return self.group.serialize(obj)
                 elif isinstance(obj, list):
-                    return [serialize_cpabe_object(v, group) for v in obj]
+                    return [serialize_element(e) for e in obj]
+                elif isinstance(obj, dict):
+                    return {k: serialize_element(v) for k, v in obj.items()}
                 else:
-                    return obj  # int, str 등은 그대로 반환
+                    return obj
 
-            serialized_key = serialize_cpabe_object(device_secret_key, self.group)
+            serialized_key = serialize_element(device_secret_key)
 
             os.makedirs(os.path.dirname(device_secret_key_file), exist_ok=True)
             with open(device_secret_key_file, "wb") as f:
                 pickle.dump(serialized_key, f)
 
-            return serialized_key
+            return device_secret_key
         except Exception as e:
             logger.error(f"개인 키 생성 실패: {e}")
             return None
