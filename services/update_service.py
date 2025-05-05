@@ -93,13 +93,10 @@ class UpdateService:
         if not (os.path.exists(public_key_file) and os.path.exists(master_key_file)):
             cpabe.setup(public_key_file, master_key_file)
 
-        if not os.path.exists(device_secret_key_file):
-            logger.warning(f"device_secret_key_file이 존재하지 않음: {device_secret_key_file}")
-        
-            serialized_device_secret_key = cpabe.generate_device_secret_key(
+        serialized_device_secret_key = cpabe.generate_device_secret_key(
                     public_key_file, master_key_file, user_attributes, device_secret_key_file
-            )
-            logger.info(f"생성된 serialized_device_secret_key: {serialized_device_secret_key}")
+        )
+        logger.info(f"생성된 serialized_device_secret_key: {serialized_device_secret_key}")  
                 
         encrypted_key = cpabe.encrypt(kbj, attribute_policy, public_key_file)
         if not encrypted_key:
