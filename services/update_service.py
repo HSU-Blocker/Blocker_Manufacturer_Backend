@@ -200,13 +200,3 @@ class UpdateService:
             tokens = [token.strip() for token in expr.split() if token.strip()]
             attributes.extend(tokens)
         return list(set(attributes))  # 중복 제거
-    
-    def json_safe(obj):
-        if isinstance(obj, bytes):
-            return base64.b64encode(obj).decode()
-        elif isinstance(obj, dict):
-            return {k: json_safe(v) for k, v in obj.items()}
-        elif isinstance(obj, list):
-            return [json_safe(i) for i in obj]
-        else:
-            return obj
