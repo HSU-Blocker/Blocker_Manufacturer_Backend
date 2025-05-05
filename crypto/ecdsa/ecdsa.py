@@ -163,4 +163,3 @@ class ECDSATools:
             )
         except BadSignatureError:
             return False
-

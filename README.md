@@ -117,4 +117,5 @@ Blocker_Manufacturer_Backend/
 
 ---
 
-> 각 함수의 파라미터, 반환값, 예외 등은 코드 내 docstring 참고. 추가 설명이 필요하면 언제든 요청하세요.
+### Swagger 접속
+http://localhost:5001/api/docs 로 접속 후 API 요청 실행

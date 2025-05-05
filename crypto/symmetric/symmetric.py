@@ -44,32 +44,3 @@ class SymmetricCrypto:
 
         return encrypted_file_path
 
-    @staticmethod
-    def decrypt_file(encrypted_file_path, key):
-        """파일을 대칭키로 AES CBC 모드로 복호화"""
-        if not os.path.exists(encrypted_file_path):
-            raise FileNotFoundError(f"파일을 찾을 수 없습니다: {encrypted_file_path}")
-
-        with open(encrypted_file_path, "rb") as file:
-            encrypted_data = file.read()
-
-        if len(encrypted_data) < 16:
-            raise ValueError("올바르지 않은 암호화 데이터입니다. (IV 없음)")
-
-        iv = encrypted_data[:16]  # IV 추출
-        encrypted_data = encrypted_data[16:]  # 암호문 분리
-
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-        decrypted_data = cipher.decrypt(encrypted_data)
-
-        try:
-            decrypted_data = unpad(decrypted_data, AES.block_size)  # 패딩 제거
-        except ValueError:
-            raise ValueError("패딩 오류: 데이터가 올바르지 않음 (복호화 실패)")
-
-        # 복호화된 파일 저장
-        decrypted_file_path = encrypted_file_path.replace(".enc", "")
-        with open(decrypted_file_path, "wb") as file:
-            file.write(decrypted_data)
-
-        return decrypted_file_path
