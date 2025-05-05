@@ -13,6 +13,7 @@ from blockchain.contract import BlockchainNotifier
 from crypto.ecdsa.ecdsa import ECDSATools
 from eth_account import Account
 from dotenv import load_dotenv
+import re
 
 # 환경변수 로드
 load_dotenv()
@@ -35,6 +36,8 @@ class UpdateService:
         cache_file=None,
     ):
         attribute_policy = UpdateService.build_attribute_policy(policy_dict)
+        logger.info(f"CP-ABE attribute_policy 정책: {attribute_policy}")
+        
         try:
             price_float = float(price_eth)
             price = int(price_float * 10**18)
@@ -86,7 +89,7 @@ class UpdateService:
         device_secret_key_file = os.path.join(key_dir, "device_secret_key_file.bin")
         
         # policy_dict의 키를 기반으로 user_attributes 생성
-        user_attributes = [v for k, v in policy_dict.items() if v]
+        user_attributes = UpdateService.extract_user_attributes(policy_dict)
         logger.info(f"추출된 user_attributes: {user_attributes}")
 
         # 이미 키 파일이 있으면 setup을 건너뜀
@@ -157,10 +160,41 @@ class UpdateService:
 
     @staticmethod
     def build_attribute_policy(policy_dict):
-        conditions = []
-        if "model" in policy_dict and policy_dict["model"]:
-            conditions.append(policy_dict["model"])
-        if "serial" in policy_dict and policy_dict["serial"]:
-            serial_value = policy_dict["serial"]
-            conditions.append(f"({serial_value} or ATTR1)")
-        return f"({' and '.join(conditions)})"
+        # 필수 속성 검사
+        required_keys = ["model", "serial"]
+        for key in required_keys:
+            if key not in policy_dict or not policy_dict[key].strip():
+                raise ValueError(f"'{key}' 속성은 필수입니다.")
+
+        def parse_expression(expr: str) -> str:
+            expr = expr.strip()
+            expr = expr.replace("AND", "and").replace("OR", "or")
+            expr = re.sub(r"\s+", " ", expr)  # 중복 공백 제거
+            return expr
+
+        # 각 key-value를 개별 정책 문자열로 변환
+        expressions = []
+        for key, value in policy_dict.items():
+            if value.strip():  # 값이 비어있지 않은 경우만 처리
+                parsed = parse_expression(value)
+                expressions.append(f"({parsed})")
+
+        # 모든 조건을 and로 연결
+        full_policy = " and ".join(expressions)
+        return full_policy
+    
+    @staticmethod
+    def extract_user_attributes(policy_dict):
+        """
+        각 policy_dict의 값에서 AND/OR/괄호 등을 제거하고 속성 리스트 추출
+        """
+        attributes = []
+        for value in policy_dict.values():
+            if not isinstance(value, str) or not value.strip():
+                continue
+            # AND, OR 제거, 괄호 제거 후 분할
+            expr = value.upper().replace("AND", " ").replace("OR", " ")
+            expr = re.sub(r"[()]", " ", expr)  # 괄호 제거
+            tokens = [token.strip() for token in expr.split() if token.strip()]
+            attributes.extend(tokens)
+        return list(set(attributes))  # 중복 제거
