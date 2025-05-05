@@ -21,8 +21,6 @@ load_dotenv()
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-DEVICE_SECRET_KEY_FOLDER = os.path.join(root_dir, "crypto/keys") #SKd 저장 폴더
 
 class UpdateService:
     @staticmethod
@@ -85,8 +83,8 @@ class UpdateService:
         public_key_file = os.path.join(key_dir, "public_key.bin")
         master_key_file = os.path.join(key_dir, "master_key.bin")
         # device_secret_key_file 경로 설정
-        device_secret_key_file = os.path.join(DEVICE_SECRET_KEY_FOLDER, "device_secret_key_file.bin")
-
+        device_secret_key_file = os.path.join(key_dir, "device_secret_key_file.bin")
+        
         # policy_dict의 키를 기반으로 user_attributes 생성
         user_attributes = [v for k, v in policy_dict.items() if v]
         logger.info(f"추출된 user_attributes: {user_attributes}")
