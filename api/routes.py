@@ -33,11 +33,14 @@ upload_parser.add_argument("policy", location="form", type=str, required=False, 
 
 # 업로드 응답 모델 정의
 upload_response_model = manufacturer_ns.model("UploadResponse", {
-    "update_id": fields.String(),
-    "ipfs_hash": fields.String(),
-    "version": fields.String(),
+    "success": fields.Boolean(description="업로드 성공 여부"),
+    "uid": fields.String(description="업데이트 ID (ex: filename_v1.0.0)"),
+    "ipfs_hash": fields.String(description="IPFS에 업로드된 파일 해시"),
+    "file_hash": fields.String(description="SHA3 해시값"),
+    "tx_hash": fields.String(description="블록체인 트랜잭션 해시"),
+    "version": fields.String(description="버전 정보"),
+    "signature": fields.String(description="업데이트 데이터에 대한 ECDSA 서명"),
 })
-
 
 
 # ✅ 소프트웨어 업로드 API
