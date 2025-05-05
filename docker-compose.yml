@@ -5,33 +5,9 @@ services:
     build: .
     container_name: blocker_manufacturer_backend
     ports:
-      - "5001:5001"
+      - "5002:5002"
     volumes:
       - ./crypto/keys:/app/crypto/keys
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
-    networks:
-      - app_network  # IPFS와 같은 네트워크에서 통신 가능하게 설정
-
-  # IPFS 노드
-  ipfs:
-    image: ipfs/kubo:latest
-    container_name: ipfs_node
-    ports:
-      - "4001:4001"   # Libp2p (P2P 연결용)
-      - "8080:8080"   # 게이트웨이
-      - "5002:5001"   # API 포트 → 컨테이너의 5001을 호스트의 5002로 매핑하여 충돌 방지
-    volumes:
-      - ipfs_data:/data/ipfs
-      - ipfs_export:/export
-    networks:
-      - app_network
-
-networks:
-  app_network:
-    driver: bridge
-
-volumes:
-  ipfs_data:
-  ipfs_export:
