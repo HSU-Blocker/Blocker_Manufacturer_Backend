@@ -118,7 +118,7 @@ Blocker_Manufacturer_Backend/
 ---
 
 ### Swagger 접속
-- 로컬 실행 시: http://localhost:5001/api/docs 
+- 로컬 실행 시: http://localhost:5002/api/docs 
 - 배포 주소 실행 시: http://52.78.52.216:5002/api/docs
 
 로 접속 후 API 요청 실행

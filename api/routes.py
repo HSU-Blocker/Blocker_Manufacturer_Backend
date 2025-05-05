@@ -29,7 +29,7 @@ upload_parser.add_argument("file", location="files", type='file', required=True,
 upload_parser.add_argument("version", location="form", type=str, required=False, help="업데이트 버전")
 upload_parser.add_argument("description", location="form", type=str, required=False, help="업데이트 설명")
 upload_parser.add_argument("price", location="form", type=str, required=False, help="가격(ETH)")
-upload_parser.add_argument("policy", location="form", type=str, required=False, help='속성 정책 (예: {"model": "K4", "serial": "123456"})')
+upload_parser.add_argument("policy", location="form", type=str, required=False, help='속성 정책 (예: {   "model": "K4 AND K5",   "serial": "123456 OR ATTR1",   "option": "A OR B AND C" })')
 
 # 업로드 응답 모델 정의
 upload_response_model = manufacturer_ns.model("UploadResponse", {
@@ -38,14 +38,7 @@ upload_response_model = manufacturer_ns.model("UploadResponse", {
     "version": fields.String(),
 })
 
-def build_attribute_policy(policy_dict):
-    conditions = []
-    if "model" in policy_dict and policy_dict["model"]:
-        conditions.append(policy_dict["model"])
-    if "serial" in policy_dict and policy_dict["serial"]:
-        serial_value = policy_dict["serial"]
-        conditions.append(f"({serial_value} or ATTR1)")
-    return f"({' and '.join(conditions)})"
+
 
 # ✅ 소프트웨어 업로드 API
 @manufacturer_ns.route("/upload")
