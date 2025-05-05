@@ -7,6 +7,7 @@ import logging
 import pickle
 from base64 import b64encode, b64decode
 from hashlib import sha256
+import base64
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -108,17 +109,19 @@ class CPABETools:
 
             device_secret_key = self.cpabe.keygen(pk, mk, attributes)
 
-            def serialize_element(obj):
-                if hasattr(obj, "initPP"):
-                    return self.group.serialize(obj)
-                elif isinstance(obj, list):
-                    return [serialize_element(e) for e in obj]
+            def serialize_cpabe_object(obj, group):
+                if hasattr(obj, "initPP"):  # pairing.Element인 경우
+                    return base64.b64encode(group.serialize(obj)).decode()
+                elif isinstance(obj, bytes):
+                    return base64.b64encode(obj).decode()
                 elif isinstance(obj, dict):
-                    return {k: serialize_element(v) for k, v in obj.items()}
+                    return {k: serialize_cpabe_object(v, group) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [serialize_cpabe_object(v, group) for v in obj]
                 else:
-                    return obj
+                    return obj  # int, str 등은 그대로 반환
 
-            serialized_key = serialize_element(device_secret_key)
+            serialized_key = serialize_cpabe_object(device_secret_key, self.group)
 
             os.makedirs(os.path.dirname(device_secret_key_file), exist_ok=True)
             with open(device_secret_key_file, "wb") as f:

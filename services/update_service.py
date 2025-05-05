@@ -12,11 +12,7 @@ from ipfs.upload import IPFSUploader
 from blockchain.contract import BlockchainNotifier
 from crypto.ecdsa.ecdsa import ECDSATools
 from eth_account import Account
-from dotenv import load_dotenv
 import re
-
-# 환경변수 로드
-load_dotenv()
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
@@ -66,7 +62,7 @@ class UpdateService:
         logger.info(f"파일 암호화 완료: {encrypted_file_path}")
         logger.info(f"파일 경로 타입: {type(encrypted_file_path)}")
         
-        # HA-3 해시 생성 hEbj
+        # SHA-3 해시 생성 hEbj
         file_hash = HashTools.sha3_hash_file(encrypted_file_path)
         
         # IPFS에 암호화된 바이너리 업로드
@@ -100,6 +96,7 @@ class UpdateService:
                     public_key_file, master_key_file, user_attributes, device_secret_key_file
         )
         logger.info(f"생성된 serialized_device_secret_key: {serialized_device_secret_key}")  
+        logger.info(f"serialized_device_secret_key type: {type(serialized_device_secret_key)}")  
                 
         encrypted_key = cpabe.encrypt(kbj, attribute_policy, public_key_file)
         if not encrypted_key:
@@ -116,12 +113,12 @@ class UpdateService:
         if os.path.exists(ecdsa_private_key_path) and os.path.exists(ecdsa_public_key_path):
             ecdsa_private_key = ECDSATools.load_private_key(ecdsa_private_key_path)
             ecdsa_public_key = ECDSATools.load_public_key(ecdsa_public_key_path)
-            print("기존 ECDSA 키 로드 완료")
+            logger.info("기존 ECDSA 키 로드 완료")
         else:
             ecdsa_private_key, ecdsa_public_key = ECDSATools.generate_key_pair(
                 ecdsa_private_key_path, ecdsa_public_key_path
             )
-            print("새 ECDSA 키 생성 완료")
+            logger.info("새 ECDSA 키 생성 완료")
         
         # 서명 생성
         signature_message = (
@@ -156,7 +153,12 @@ class UpdateService:
             "tx_hash": tx_hash_str,
             "version": version,
             "signature": base64.b64encode(signature).decode(),
+            "kbj": base64.b64encode(cpabe_group.serialize(kbj)).decode(),
+            "aes_key": base64.b64encode(aes_key).decode(),
+            "encrypted_key": encrypted_key, 
+            "device_secret_key": serialized_device_secret_key,
         }
+    
 
     @staticmethod
     def build_attribute_policy(policy_dict):
