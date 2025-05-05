@@ -29,7 +29,7 @@ upload_parser.add_argument("file", location="files", type='file', required=True,
 upload_parser.add_argument("version", location="form", type=str, required=False, help="업데이트 버전")
 upload_parser.add_argument("description", location="form", type=str, required=False, help="업데이트 설명")
 upload_parser.add_argument("price", location="form", type=str, required=False, help="가격(ETH)")
-upload_parser.add_argument("policy", location="form", type=str, required=False, help='속성 정책 (예: {   "model": "K4 AND K5",   "serial": "123456 OR ATTR1",   "option": "A OR B AND C" })')
+upload_parser.add_argument("policy", location="form", type=str, required=False, help='속성 정책 (예: {   "model": "K4 OR K5",   "serial": "123456 AND ATTR1",   "option": "A OR B OR C" })')
 
 # 업로드 응답 모델 정의
 upload_response_model = manufacturer_ns.model("UploadResponse", {
