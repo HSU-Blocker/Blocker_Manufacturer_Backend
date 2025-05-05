@@ -40,6 +40,10 @@ upload_response_model = manufacturer_ns.model("UploadResponse", {
     "tx_hash": fields.String(description="블록체인 트랜잭션 해시"),
     "version": fields.String(description="버전 정보"),
     "signature": fields.String(description="업데이트 데이터에 대한 ECDSA 서명"),
+    "kbj": fields.String(description="원본 대칭 키, CP-ABE로 암호화되어 속성 기반 접근 제어에 사용"),
+    "aes_key": fields.String(description="파일 암호화&복호화에 사용되는 AES 대칭키. kbj를 바이트로 직렬화한 후, SHA-256 해시를 통해 생성한 32바이트 AES-256 키"),
+    "encrypted_key": fields.String(description="CP-ABE 알고리즘에 의해 정책 기반으로 암호화된 kbj. 이 암호문을 통해 정책에 부합하는 사용자만 kbj를 복호화 가능"),
+    "device_secret_key": fields.String(description="사용자의 속성에 기반해 생성된 개인 키 & CP-ABE로 암호화된 kbj를 복호화 하는 키. 해당 속성들이 암호화 시 정의된 접근 정책을 만족할 경우에만 복호화가 가능"),
 })
 
 
