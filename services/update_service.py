@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import base64
+import gzip
 import logging
 from flask import jsonify
 from werkzeug.utils import secure_filename
@@ -105,6 +106,10 @@ class UpdateService:
         if not encrypted_key:
             raise Exception("CP-ABE 암호화 실패: encrypted_key가 None입니다.")
         logger.info(f"CP-ABE로 대칭키 암호화 완료, encrypted_key: {encrypted_key}")
+        
+        # 암호화된 키 압축 및 인코딩
+        compressed_key = gzip.compress(encrypted_key.encode('utf-8'))
+        encrypted_key = base64.b64encode(compressed_key).decode('utf-8')
 
         update_uid = f"{original_filename.split('.')[0]}_v{version}" 
         logger.debug(f"업데이트 UID 생성: {update_uid}")    
