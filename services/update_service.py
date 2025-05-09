@@ -107,10 +107,14 @@ class UpdateService:
 
         encrypted_key = cpabe.encrypt(kbj, attribute_policy, public_key_file)
         if encrypted_key:
-            encrypted_key = base64.b64encode(encrypted_key.encode()).decode()
-        if not encrypted_key:
+            encrypted_key_bytes = encrypted_key.encode()
+        else:
+            encrypted_key_bytes = b""
+        if not encrypted_key_bytes:
             raise Exception("CP-ABE 암호화 실패: encrypted_key가 None입니다.")
-        logger.info(f"CP-ABE로 대칭키 암호화 완료, encrypted_key: {encrypted_key}")
+        logger.info(
+            f"CP-ABE로 대칭키 암호화 완료, encrypted_key(bytes): {encrypted_key_bytes[:32]} ... (len={len(encrypted_key_bytes)})"
+        )
 
         update_uid = f"{original_filename.split('.')[0]}_v{version}"
         logger.debug(f"업데이트 UID 생성: {update_uid}")
@@ -148,7 +152,7 @@ class UpdateService:
         tx_hash = notifier.register_update(
             uid=update_uid,
             ipfs_hash=ipfs_hash,
-            encrypted_key=encrypted_key,
+            encrypted_key=encrypted_key_bytes,  # bytes로 전달
             hash_of_update=file_hash,
             description=description,
             price=price,

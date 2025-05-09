@@ -1,5 +1,6 @@
 import json
 import os
+import base64
 from web3 import Web3
 
 # 블록체인 스마트컨트랙트 연동 모듈 (예시)
@@ -171,7 +172,9 @@ class BlockchainNotifier:
                     update_info = {
                         "uid": uid,
                         "ipfs_hash": info[0] if len(info) > 0 else "",
-                        "encrypted_key": info[1] if len(info) > 1 else "",
+                        "encrypted_key": (
+                            base64.b64encode(info[1]).decode() if info[1] else ""
+                        ),
                         "description": info[3] if len(info) > 3 else "",
                         "price": float(info[4]) / 1e18 if len(info) > 4 else 0,
                         "version": info[5] if len(info) > 5 else "",
