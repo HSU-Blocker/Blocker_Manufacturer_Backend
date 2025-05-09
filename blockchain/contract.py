@@ -171,6 +171,7 @@ class BlockchainNotifier:
                     update_info = {
                         "uid": uid,
                         "ipfs_hash": info[0] if len(info) > 0 else "",
+                        "encrypted_key": info[1] if len(info) > 1 else "",
                         "description": info[3] if len(info) > 3 else "",
                         "price": float(info[4]) / 1e18 if len(info) > 4 else 0,
                         "version": info[5] if len(info) > 5 else "",
