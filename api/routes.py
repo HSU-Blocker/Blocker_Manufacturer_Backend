@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 import os
 import json
+import re
 from werkzeug.utils import secure_filename
 from flask_restx import Api, Resource, Namespace, fields, reqparse
 
@@ -184,8 +185,18 @@ class CancelUpdate(Resource):
             if not uid:
                 return {"success": False, "error": "uid는 필수입니다."}, 400
             notifier = BlockchainNotifier()
-            tx_hash = notifier.cancel_update(uid)
-            tx_hash_str = tx_hash.hex() if hasattr(tx_hash, "hex") else str(tx_hash)
-            return {"success": True, "tx_hash": tx_hash_str}
+            try:
+                tx_hash = notifier.cancel_update(uid)
+                tx_hash_str = tx_hash.hex() if hasattr(tx_hash, "hex") else str(tx_hash)
+                return {"success": True, "tx_hash": tx_hash_str}
+            except Exception as e:
+                # revert reason만 추출해서 반환
+                error_str = str(e)
+                match = re.search(r"reason': '([^']+)'", error_str)
+                if match:
+                    revert_reason = match.group(1)
+                else:
+                    revert_reason = error_str
+                return {"success": False, "error": revert_reason}, 400
         except Exception as e:
             return {"success": False, "error": str(e)}, 500
