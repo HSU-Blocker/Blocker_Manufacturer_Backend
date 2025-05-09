@@ -11,7 +11,6 @@ class BlockchainNotifier:
         self,
         provider_url=None,
         registry_info_path=None,
-        update_abi_path=None,
         account_address=None,
         private_key=None,
     ):
@@ -26,11 +25,6 @@ class BlockchainNotifier:
             registry_info_path = os.path.join(
                 os.path.dirname(__file__), "registry_address.json"
             )
-        # SoftwareUpdateContract ABI 경로
-        if update_abi_path is None:
-            update_abi_path = os.path.join(
-                os.path.dirname(__file__), "contract_address.json"
-            )
         # AddressRegistry 주소/ABI 로드
         with open(registry_info_path, "r") as f:
             reg_info = json.load(f)
@@ -39,14 +33,14 @@ class BlockchainNotifier:
         registry_contract = self.web3.eth.contract(
             address=registry_address, abi=registry_abi
         )
-        # SoftwareUpdateContract 주소 동적 조회
+        # SoftwareUpdateContract 주소와 ABI를 레지스트리에서 직접 조회
         update_address = registry_contract.functions.getContractAddress(
             "SoftwareUpdateContract"
         ).call()
-        # SoftwareUpdateContract ABI 로드
-        with open(update_abi_path, "r") as f:
-            update_abi_json = json.load(f)
-        update_abi = update_abi_json["abi"]
+        update_abi_json = registry_contract.functions.getAbi(
+            "SoftwareUpdateContract"
+        ).call()
+        update_abi = json.loads(update_abi_json)
         self.contract = self.web3.eth.contract(address=update_address, abi=update_abi)
         self.account_address = account_address or os.environ.get("BLOCKCHAIN_ACCOUNT")
         self.private_key = private_key or os.environ.get("BLOCKCHAIN_PRIVATE_KEY")
