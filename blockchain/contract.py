@@ -161,8 +161,8 @@ class BlockchainNotifier:
                 try:
                     uid = self.contract.functions.getUpdateIdByIndex(idx).call()
                     info = self.contract.functions.getUpdateInfo(uid).call()
-                    # info: [ipfsHash, encryptedKey, hashOfUpdate, description, price, version, isAuthorized, isValid]
-                    is_valid = info[7] if len(info) > 7 else True
+                    # info: [ipfsHash, encryptedKey, hashOfUpdate, description, price, version, isValid]
+                    is_valid = info[6] if len(info) > 6 else True
                     update_info = {
                         "uid": uid,
                         "ipfs_hash": info[0] if len(info) > 0 else "",
