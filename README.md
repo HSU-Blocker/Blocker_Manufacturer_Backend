@@ -117,14 +117,6 @@ Blocker_Manufacturer_Backend/
 
 ---
 
-## Swagger 접속
-- 로컬 실행 시: http://localhost:5002/api/docs 
-- 배포 주소 실행 시: http://52.78.52.216:5002/api/docs
-
-로 접속 후 API 요청 실행
-
----
-
 ## 🔐 암호화 키 정의
 
 이 시스템은 **CP-ABE (Ciphertext-Policy Attribute-Based Encryption)** 와 **AES-256** 을 조합하여 안전한 파일 암호화를 수행합니다. 사용되는 주요 키는 다음과 같습니다:
