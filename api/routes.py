@@ -91,6 +91,54 @@ cancel_response_model = manufacturer_ns.model(
     },
 )
 
+# 페이지네이션 정보 모델
+pagination_model = manufacturer_ns.model(
+    "Pagination",
+    {
+        "current_page": fields.Integer(description="현재 페이지 번호"),
+        "per_page": fields.Integer(description="페이지당 항목 수"),
+        "total_count": fields.Integer(description="전체 항목 수"),
+        "total_pages": fields.Integer(description="전체 페이지 수"),
+        "has_next": fields.Boolean(description="다음 페이지 존재 여부"),
+        "has_prev": fields.Boolean(description="이전 페이지 존재 여부"),
+        "start_index": fields.Integer(description="현재 페이지 시작 인덱스"),
+        "end_index": fields.Integer(description="현재 페이지 끝 인덱스"),
+    },
+)
+
+# 업데이트 정보 모델
+update_info_model = manufacturer_ns.model(
+    "UpdateInfo",
+    {
+        "uid": fields.String(description="업데이트 고유 ID"),
+        "ipfs_hash": fields.String(description="IPFS 해시"),
+        "encrypted_key": fields.String(description="암호화된 키"),
+        "hash_of_update": fields.String(description="업데이트 해시"),
+        "description": fields.String(description="업데이트 설명"),
+        "price": fields.Float(description="가격 (ETH)"),
+        "version": fields.String(description="버전"),
+        "isValid": fields.Boolean(description="유효성 여부"),
+    },
+)
+
+# 페이지네이션 업데이트 목록 응답 모델
+paginated_updates_model = manufacturer_ns.model(
+    "PaginatedUpdates",
+    {
+        "updates": fields.List(fields.Nested(update_info_model), description="업데이트 목록"),
+        "pagination": fields.Nested(pagination_model, description="페이지네이션 정보"),
+    },
+)
+
+# 업데이트 목록 쿼리 파라미터 파서
+updates_parser = reqparse.RequestParser()
+updates_parser.add_argument(
+    "page", type=int, required=False, default=None, help="페이지 번호 (1부터 시작, 생략시 전체 조회)"
+)
+updates_parser.add_argument(
+    "limit", type=int, required=False, default=20, help="페이지당 항목 수 (기본 20, 최대 100)"
+)
+
 
 # ✅ 소프트웨어 업로드 API
 @manufacturer_ns.route("/upload")
@@ -130,32 +178,87 @@ class SoftwareUpload(Resource):
             return {"error": str(e)}, 500
 
 
-# ✅ 유효한 소프트웨어 업데이트 목록 조회 API
+# ✅ 소프트웨어 업데이트 목록 조회 API (페이지네이션 지원)
 @manufacturer_ns.route("/updates")
 class SoftwareList(Resource):
+    @manufacturer_ns.expect(updates_parser)
+    @manufacturer_ns.response(200, "업데이트 목록 조회 성공", paginated_updates_model)
     @manufacturer_ns.doc(
-        description="유효한(취소되지 않은) 소프트웨어 업데이트 목록 조회 API"
+        description="""
+        소프트웨어 업데이트 목록 조회 API (유효한 업데이트만)
+        
+        쿼리 파라미터:
+        - page: 페이지 번호 (1부터 시작, 생략시 전체 조회)
+        - limit: 페이지당 항목 수 (기본 20, 최대 100)
+        
+        예시:
+        - /updates (전체 조회, 기존 방식과 호환)
+        - /updates?page=1&limit=20 (1페이지, 20개씩)
+        - /updates?page=2&limit=10 (2페이지, 10개씩)
+        """
     )
     def get(self):
         try:
+            args = updates_parser.parse_args()
+            page = args.get('page')
+            limit = args.get('limit', 20)
+            
             notifier = BlockchainNotifier()
-            updates = notifier.get_updates(include_invalid=False)
-            return {"updates": updates}
+            
+            # 페이지 파라미터가 없으면 기존 방식으로 전체 조회 (하위 호환성)
+            if page is None:
+                updates = notifier.get_updates(include_invalid=False)
+                return {"updates": updates}
+            
+            # 페이지네이션 조회
+            result = notifier.get_updates_paginated(
+                page=page, 
+                limit=limit, 
+                include_invalid=False
+            )
+            return result
+            
         except Exception as e:
             return {"error": str(e), "updates": []}, 500
 
 
-# ✅ 전체 소프트웨어 업데이트 목록 조회 API
+# ✅ 전체 소프트웨어 업데이트 목록 조회 API (페이지네이션 지원)
 @manufacturer_ns.route("/updates/all")
 class SoftwareListAll(Resource):
+    @manufacturer_ns.expect(updates_parser)
+    @manufacturer_ns.response(200, "전체 업데이트 목록 조회 성공", paginated_updates_model)
     @manufacturer_ns.doc(
-        description="전체(취소 포함) 소프트웨어 업데이트 목록 조회 API. isValid 필드 포함"
+        description="""
+        전체 소프트웨어 업데이트 목록 조회 API (취소된 업데이트 포함)
+        
+        쿼리 파라미터:
+        - page: 페이지 번호 (1부터 시작, 생략시 전체 조회)
+        - limit: 페이지당 항목 수 (기본 20, 최대 100)
+        
+        각 업데이트에 isValid 필드 포함
+        """
     )
     def get(self):
         try:
+            args = updates_parser.parse_args()
+            page = args.get('page')
+            limit = args.get('limit', 20)
+            
             notifier = BlockchainNotifier()
-            updates = notifier.get_updates(include_invalid=True)
-            return {"updates": updates}
+            
+            # 페이지 파라미터가 없으면 기존 방식으로 전체 조회 (하위 호환성)
+            if page is None:
+                updates = notifier.get_updates(include_invalid=True)
+                return {"updates": updates}
+            
+            # 페이지네이션 조회
+            result = notifier.get_updates_paginated(
+                page=page, 
+                limit=limit, 
+                include_invalid=True
+            )
+            return result
+            
         except Exception as e:
             return {"error": str(e), "updates": []}, 500
 

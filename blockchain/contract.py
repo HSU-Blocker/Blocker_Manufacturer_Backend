@@ -200,3 +200,114 @@ class BlockchainNotifier:
         )
         tx_hash = self.web3.eth.send_raw_transaction(signed_tx.raw_transaction)
         return tx_hash
+
+    def get_updates_paginated(self, page=1, limit=20, include_invalid=False):
+        """
+        페이지네이션을 지원하는 업데이트 목록 조회
+
+        Args:
+            page (int): 페이지 번호 (1부터 시작)
+            limit (int): 페이지당 항목 수 (기본 20, 최대 100)
+            include_invalid (bool): 취소된 업데이트 포함 여부
+
+        Returns:
+            dict: 업데이트 목록과 페이지네이션 정보
+        """
+        # 입력값 검증
+        if page < 1:
+            page = 1
+        if limit < 1:
+            limit = 20
+        if limit > 100:  # 최대 100개로 제한
+            limit = 100
+
+        updates = []
+        try:
+            # 전체 업데이트 개수 조회
+            total_count = self.contract.functions.getUpdateCount().call()
+
+            # 페이지네이션 계산
+            start_index = (page - 1) * limit
+            end_index = min(start_index + limit, total_count)
+
+            # 전체 페이지 수 계산
+            total_pages = (total_count + limit - 1) // limit if total_count > 0 else 0
+
+            # 요청한 페이지가 범위를 벗어난 경우
+            if start_index >= total_count and total_count > 0:
+                return {
+                    "updates": [],
+                    "pagination": {
+                        "current_page": page,
+                        "per_page": limit,
+                        "total_count": total_count,
+                        "total_pages": total_pages,
+                        "has_next": False,
+                        "has_prev": page > 1,
+                    },
+                }
+
+            print(
+                f"페이지네이션 조회: 페이지 {page}, 범위 {start_index}~{end_index-1}, 전체 {total_count}개"
+            )
+
+            # 지정된 범위의 업데이트만 조회
+            for idx in range(start_index, end_index):
+                try:
+                    uid = self.contract.functions.getUpdateIdByIndex(idx).call()
+                    info = self.contract.functions.getUpdateInfo(uid).call()
+
+                    # info: [ipfsHash, encryptedKey, hashOfUpdate, description, price, version, isValid]
+                    is_valid = info[6] if len(info) > 6 else True
+
+                    # include_invalid가 False면 유효한 업데이트만 포함
+                    if not include_invalid and not is_valid:
+                        continue
+
+                    update_info = {
+                        "uid": uid,
+                        "ipfs_hash": info[0] if len(info) > 0 else "",
+                        "encrypted_key": (
+                            base64.b64encode(info[1]).decode() if info[1] else ""
+                        ),
+                        "hash_of_update": info[2] if len(info) > 2 else "",
+                        "description": info[3] if len(info) > 3 else "",
+                        "price": float(info[4]) / 1e18 if len(info) > 4 else 0,
+                        "version": info[5] if len(info) > 5 else "",
+                        "isValid": is_valid,
+                    }
+                    updates.append(update_info)
+
+                except Exception as e:
+                    print(f"인덱스 {idx}의 업데이트 조회 오류: {str(e)}")
+                    continue
+
+            # 페이지네이션 정보 구성
+            pagination_info = {
+                "current_page": page,
+                "per_page": limit,
+                "total_count": total_count,
+                "total_pages": total_pages,
+                "has_next": page < total_pages,
+                "has_prev": page > 1,
+                "start_index": start_index + 1 if total_count > 0 else 0,
+                "end_index": min(start_index + len(updates), total_count),
+            }
+
+            return {"updates": updates, "pagination": pagination_info}
+
+        except Exception as e:
+            print(f"페이지네이션 업데이트 목록 조회 중 오류 발생: {str(e)}")
+            return {
+                "updates": [],
+                "pagination": {
+                    "current_page": page,
+                    "per_page": limit,
+                    "total_count": 0,
+                    "total_pages": 0,
+                    "has_next": False,
+                    "has_prev": False,
+                    "start_index": 0,
+                    "end_index": 0,
+                },
+            }
