@@ -168,12 +168,6 @@ class UpdateService:
             "tx_hash": tx_hash_str,
             "version": version,
             "signature": base64.b64encode(signature).decode(),
-            "kbj": base64.b64encode(cpabe_group.serialize(kbj)).decode(),
-            "aes_key": base64.b64encode(aes_key).decode(),
-            "encrypted_key": encrypted_key,
-            "device_secret_key": UpdateService.make_json_serializable(
-                serialized_device_secret_key, cpabe_group
-            ),
         }
 
     @staticmethod
