@@ -43,4 +43,3 @@ class SymmetricCrypto:
             file.write(iv + encrypted_data)  # IV + 암호문 저장
 
         return encrypted_file_path
-
