@@ -71,11 +71,19 @@ class UpdateService:
         # IPFS에 암호화된 바이너리 업로드
         try:
             ipfs_uploader = IPFSUploader()
-            ipfs_hash = ipfs_uploader.upload_file(encrypted_file_path)
-            logger.info(f"IPFS 업로드 완료: {ipfs_hash}")
+            upload_result = ipfs_uploader.upload_file(encrypted_file_path)
+            if not upload_result:
+                raise Exception("IPFS 업로드 결과가 없습니다.")
+
+            ipfs_hash = upload_result["cid"]
+            file_name = upload_result["file_name"]
+            sha3_hash = upload_result["sha3"]
+
+            logger.info(f"IPFS 업로드 완료: CID={ipfs_hash}, 파일명={file_name}, SHA3={sha3_hash}")
+
         except ConnectionError as ce:
             logger.error(f"IPFS 연결 오류: {ce}")
-            return jsonify({"error": f"IPFS 연결에 실패했습니다.: {e}"}), 500
+            return jsonify({"error": f"IPFS 연결에 실패했습니다: {ce}"}), 500
         except Exception as e:
             logger.error(f"IPFS 업로드 중 예외 발생: {e}")
             return jsonify({"error": f"IPFS 업로드 실패: {e}"}), 500
