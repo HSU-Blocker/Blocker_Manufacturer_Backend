@@ -6,8 +6,26 @@ services:
     container_name: blocker_manufacturer_backend
     ports:
       - "5002:5002"
-    volumes:
-      - ./crypto/keys:/app/crypto/keys
     environment:
       - PYTHONUNBUFFERED=1
+      - IPFS_API_URL=/dns/ipfs/tcp/5001/http
+    depends_on:
+      - ipfs
     restart: unless-stopped
+    networks:
+      - app-network 
+
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: ipfs_node
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true    # 이미 만들어둔 네트워크를 공유
