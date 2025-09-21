@@ -40,13 +40,7 @@ class IPFSUploader:
 
         try:
             if self.ipfs_available:
-                logger.info(f"⏳ IPFS에 파일 업로드 시작: {file_path}")
-
-                # SHA-3 해시 계산
-                with open(file_path, "rb") as f:
-                    file_data = f.read()
-                sha3_hash = hashlib.sha3_256(file_data).hexdigest()
-                logger.info(f"🔑 SHA-3 해시 계산 완료: {sha3_hash}")
+                logger.info(f"IPFS에 파일 업로드 시작: {file_path}")
 
                 # wrap-with-directory 옵션 → 파일명 보존
                 result = self.client.add(file_path, wrap_with_directory=True)
@@ -69,20 +63,20 @@ class IPFSUploader:
                 # 블록체인에 저장할 해시값은 디렉토리 CID
                 cid = dir_cid
 
-                logger.info(f"✅ 파일 업로드 완료! CID: {cid}, 파일명: {file_name}")
+                logger.info(f"파일 업로드 완료 CID: {cid}, 파일명: {file_name}")
 
                 # DHT 등록
-                logger.info("📢 DHT에 CID 등록 중...")
+                logger.info("DHT에 CID 등록 중")
                 subprocess.run(["ipfs", "dht", "provide", cid], capture_output=True, text=True)
                 time.sleep(5)
-                logger.info("✅ DHT 등록 완료!")
+                logger.info("DHT 등록 완료") # DHT 등록이 퍼질 시간을 줌
 
-                # 핀 추가
-                logger.info("📌 핀 설정 중...")
+                # 핀 추가 (파일을 노드에 유지)
+                logger.info("핀 설정 중")
                 self.client.pin.add(cid)
-                logger.info("✅ 핀 설정 완료!")
+                logger.info("핀 설정 완료")
 
-                return {"cid": cid, "file_name": file_name, "sha3": sha3_hash}
+                return {"cid": cid, "file_name": file_name,}
 
             else:
                 raise ConnectionError("🚨 IPFS 노드에 연결할 수 없습니다.")

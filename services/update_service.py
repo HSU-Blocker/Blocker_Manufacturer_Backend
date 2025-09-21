@@ -77,9 +77,8 @@ class UpdateService:
 
             ipfs_hash = upload_result["cid"]
             file_name = upload_result["file_name"]
-            sha3_hash = upload_result["sha3"]
 
-            logger.info(f"IPFS 업로드 완료: CID={ipfs_hash}, 파일명={file_name}, SHA3={sha3_hash}")
+            logger.info(f"IPFS 업로드 완료: CID={ipfs_hash}, 파일명={file_name}")
 
         except ConnectionError as ce:
             logger.error(f"IPFS 연결 오류: {ce}")
