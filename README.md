@@ -1,89 +1,96 @@
 # Blocker Manufacturer Backend
 
-### 1. 서비스 개요
+## Overview
+This repository implements the manufacturer backend of a blockchain-based secure software update platform. The manufacturer prepares and encrypts software updates, publishes update metadata and purchase information to a blockchain smart contract, and stores encrypted update packages on IPFS. Devices then discover updates, purchase them, download the encrypted packages from IPFS, verify integrity, and decrypt them using CP-ABE-managed keys.
 
-Blocker Manufacturer Backend는 제조사가 배포하는 소프트웨어 업데이트를 안전하게 암호화·배포하고, 업데이트 메타데이터를 블록체인에 등록하여 무결성과 접근 제어를 보장하는 백엔드 서비스입니다. 주요 기능은 다음과 같습니다:
+### Manufacturer Update Process
+1. Prepare the update package and encrypt the file with a generated symmetric key (AES-256).
+2. Encrypt the symmetric key under a CP-ABE policy (producing Ec) so only compliant devices can decrypt it.
+3. Upload the encrypted update file to IPFS and obtain the CID (Es).
+4. Compute hashes (e.g., SHA3-256) of the encrypted file for integrity reference.
+5. Sign metadata (version, price, CID, file hash, description) with the manufacturer's ECDSA private key.
+6. Register the update metadata and purchase conditions on the blockchain smart contract.
+7. Optionally monitor purchase events and deliver post-purchase actions (e.g., revoke, update policies).
 
-- 파일 암호화(AES-256) 및 정책 기반 키 암호화(CP-ABE)
-- IPFS에 암호화된 업데이트 파일 업로드 및 CID(해시) 관리
-- ECDSA 서명으로 업데이트 무결성 보증
-- 스마트컨트랙트에 업데이트 메타데이터(버전, 설명, 가격, CID 등) 등록
-- 서비스 계층 분리로 라우트에서 비즈니스 로직 분리
+## Development Environment
+- OS: macOS (development recommended)
+- Shell: zsh
+- Python: 3.10 or newer
+- Dependencies: listed in `requirements.txt`
+- Entry point: `main.py`
+- Containerization: Docker & Docker Compose supported
 
-### 2. 개발 환경
+## Technology Stack
 
-- 운영체제: macOS (개발/테스트 권장)
-- 셸: zsh
-- Python: 3.10 이상 권장
-- 의존성: `requirements.txt`에 정의
-- 실행 진입점: `main.py`
+- ![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)  Web framework used for the backend API and admin endpoints (imports in `main.py` and `api/routes.py`).
 
-자세한 설치 및 실행 방법은 `install.md`를 참고하세요.
+- ![Flask-RESTX](https://img.shields.io/badge/Flask--RESTX-007ACC?style=flat&logo=python&logoColor=white)  API documentation and request parsing (used in `api/routes.py`).
 
-### 3. 사용 기술
+- ![Web3.py](https://img.shields.io/badge/Web3.py-F16822?style=flat&logo=ethereum&logoColor=white)  Ethereum/compatible blockchain interactions (used in `blockchain/contract.py`).
 
-- 웹 프레임워크: Flask (Blueprint 기반 라우팅)
-- 블록체인 연동: web3.py 또는 유사한 Ethereum 클라이언트 연동 (스마트컨트랙트 ABI 사용)
-- 분산저장: IPFS (파일 업로드 및 핀)
-- 암호화/키 관리:
-  - CP-ABE (Ciphertext-Policy Attribute-Based Encryption) - `crypto/cpabe`
-  - ECDSA 서명/검증 - `crypto/ecdsa`
-  - 대칭암호(AES-256) - `crypto/symmetric`
-  - 해시(SHA-3 등) - `crypto/hash`
-- 로깅/유틸: 프로젝트 내 `utils/logger.py`
-- 컨테이너화(선택): Docker, Docker Compose
+- ![IPFS](https://img.shields.io/badge/IPFS-65C2CB?style=flat&logo=ipfs&logoColor=white)  IPFS client (`ipfshttpclient`) for uploading encrypted update files (`ipfs/upload.py`).
 
-### 4. 폴더 구조
+- ![Charm-Crypto](https://img.shields.io/badge/Charm--Crypto-6C3483?style=flat&logo=academia&logoColor=white)  CP-ABE implementation (used in `crypto/cpabe/cpabe.py`).
 
-프로젝트 최상위 폴더 구조 및 각 폴더의 역할은 다음과 같습니다:
+- ![PyCryptodome](https://img.shields.io/badge/PyCryptodome-006699?style=flat&logo=python&logoColor=white)  AES-256 symmetric encryption utilities (`crypto/symmetric/symmetric.py`).
 
+- ![SHA3-256](https://img.shields.io/badge/SHA3--256-117A65?style=flat&logo=hashnode&logoColor=white)  File integrity hashing (uses `hashlib.sha3_256` in `crypto/hash/hash.py`).
+
+- ![ECDSA](https://img.shields.io/badge/ECDSA-34495E?style=flat&logo=openssl&logoColor=white)  Signature creation/verification utilities (see `crypto/ecdsa/ecdsa.py`).
+
+- ![Python](https://img.shields.io/badge/Python_3.10-3776AB?style=flat&logo=python&logoColor=white)  Project language and runtime environment.
+
+- ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)  Containerization support (see `Dockerfile`).
+
+## Installation
+See `install.md` for installation and usage instructions.
+
+## Directory Structure
 ```
 Blocker_Manufacturer_Backend/
 │
-├── main.py                # 앱 실행 진입점
-├── README.md              # 프로젝트 설명 (현재 파일)
-├── install.md             # 설치 및 실행 가이드
-├── requirements.txt       # Python 의존성
+├── main.py                # Application entry point
+├── README.md              # Project description (this file)
+├── install.md             # Installation and run guide
+├── requirements.txt       # Python dependencies
 │
-├── api/                   # API 엔드포인트(Flask Blueprint)
+├── api/                   # API endpoints (Flask Blueprint)
 │   └── routes.py
 │
-├── blockchain/            # 블록체인 연동 모듈
-│   ├── contract.py        # 스마트컨트랙트 연동 클래스
+├── blockchain/            # Blockchain integration modules
+│   ├── contract.py        # Smart contract interface class
 │   ├── utils.py
 │   └── registry_address.json
 │
-├── crypto/                # 암호화 및 해시 관련 모듈
-│   ├── cpabe/             # CP-ABE 관련 구현
+├── crypto/                # Crypto and hashing modules
+│   ├── cpabe/             # CP-ABE implementation
 │   │   └── cpabe.py
-│   ├── ecdsa/             # ECDSA 서명/검증
+│   ├── ecdsa/             # ECDSA sign/verify
 │   │   └── ecdsa.py
-│   ├── hash/              # 해시 함수
+│   ├── hash/              # Hash utilities (SHA3, etc.)
 │   │   └── hash.py
-│   ├── symmetric/         # 대칭키 암호화/복호화
+│   ├── symmetric/         # Symmetric encryption/decryption (AES-256)
 │   │   └── symmetric.py
-│   └── keys/              # 키 파일 (PEM, master key 등)
+│   └── keys/              # Key files (PEM, master key, etc.)
 │       ├── device_secret_key_file.bin
 │       ├── ecdsa_private_key.pem
 │       ├── ecdsa_public_key.pem
 │       ├── master_key.bin
 │       └── public_key.bin
 │
-├── ipfs/                  # IPFS 업로드 기능
+├── ipfs/                  # IPFS upload utilities
 │   └── upload.py
 │
-├── services/              # 비즈니스 로직(서비스 계층)
+├── services/              # Business logic (service layer)
 │   └── update_service.py
 │
-└── utils/                 # 공통 유틸리티
+└── utils/                 # Common utilities
     └── logger.py
 ```
 
-- 설계 원칙:
-  - 라우트는 요청/응답 처리만 담당하고 내부 비즈니스 로직은 `services/`에 위임합니다.
-  - 암호화 관련 코드는 `crypto/` 아래에 모아 단일 책임 원칙을 유지합니다.
-  - 민감 키 파일은 `crypto/keys/`에 보관하며 접근 권한을 제한해야 합니다.
+## License
+This project is licensed under the MIT License. See `LICENSE` for details.
 
 ---
 
-추가로, 설치 및 실행 관련 상세 절차는 프로젝트 루트의 `install.md` 파일을 확인하세요.
+Contributions and questions are welcome via Issues and Pull Requests. For more information about the overall project, visit the organization repository or open an issue on this repository.
