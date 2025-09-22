@@ -28,4 +28,4 @@ services:
 
 networks:
   app-network:
-    external: bridge
+    driver: bridge
