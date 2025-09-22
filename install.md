@@ -18,20 +18,7 @@ git clone <repo-url>
 cd Blocker_Manufacturer_Backend
 ```
 
-2. Create and activate a Python virtual environment
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Configure environment variables
+2. Configure environment variables
 
 Required example environment variables:
 - INFURA_URL or ETH_NODE_URL: Ethereum node endpoint
@@ -46,24 +33,7 @@ PRIVATE_KEY=0x...
 IPFS_API=http://127.0.0.1:5001
 ```
 
-5. Prepare key files
-
-Check the `crypto/keys/` folder for the required key files. Generate new keys or replace them with test keys if needed.
-
-6. Database (optional)
-
-The current example assumes simple file- or in-memory-based storage. If persistent storage is required, add a database connection and migrations.
-
-7. Run the application
-
-```bash
-# With the virtual environment activated
-python main.py
-```
-
-By default, the Flask app will bind to a port (e.g., 5000). You can change the port or debug settings in `main.py`.
-
-## 3. Run with Docker (optional)
+## 3. Run with Docker
 
 1. Build the Docker image
 
@@ -79,14 +49,16 @@ docker compose up --build
 
 You can configure blockchain nodes, IPFS nodes, and other services in `docker-compose.yml` to connect to a test network if needed.
 
-## 4. Testing
+
+
+## 4. Testing(optional)
 
 - Test API endpoints with `curl`, Postman, or similar tools.
 - Example endpoints:
   - POST /api/manufacturer/upload: Upload and register an update file
   - GET /api/manufacturer/updates: List registered updates
 
-## 5. Security Recommendations
+## 5. Security Recommendations(optional)
 
 - In production, store sensitive secrets (e.g., PRIVATE_KEY, master keys) in a secure secret manager (Vault, KMS, etc.).
 - Restrict filesystem permissions for the `crypto/keys/` folder.
