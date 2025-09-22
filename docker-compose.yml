@@ -13,7 +13,7 @@ services:
       - ipfs
     restart: unless-stopped
     networks:
-      - app-network 
+      - app-network-manufacturer
 
   ipfs:
     image: ipfs/kubo:latest
@@ -24,8 +24,8 @@ services:
       - "8080:8080"
     restart: unless-stopped
     networks:
-      - app-network
+      - app-network-manufacturer
 
 networks:
-  app-network:
+  app-network-manufacturer:
     driver: bridge
