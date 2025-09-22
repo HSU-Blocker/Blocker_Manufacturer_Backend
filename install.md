@@ -20,17 +20,12 @@ cd Blocker_Manufacturer_Backend
 
 2. Configure environment variables
 
-Required example environment variables:
-- INFURA_URL or ETH_NODE_URL: Ethereum node endpoint
-- PRIVATE_KEY: ECDSA private key used for signing transactions (for testing)
-- IPFS_API: IPFS API endpoint
-
 To set environment variables locally, create a `.env` file and add keys like:
 
 ```env
-ETH_NODE_URL=https://mainnet.infura.io/v3/<PROJECT_ID>
-PRIVATE_KEY=0x...
-IPFS_API=http://127.0.0.1:5001
+BLOCKCHAIN_ACCOUNT=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+BLOCKCHAIN_PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff94***********************
+IPFS_API_URL=/dns/ipfs/tcp/5001/http
 ```
 
 ## 3. Run with Docker
