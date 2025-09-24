@@ -53,7 +53,7 @@ You can configure blockchain nodes, IPFS nodes, and other services in `docker-co
 - Example endpoints:
   - POST /api/manufacturer/upload: Upload and register an update file
   - GET /api/manufacturer/updates: List registered updates
-- Alternatively, you can access Swagger for testing at 127.0.0.1/api/docs.
+- Alternatively, you can access Swagger for testing at http://127.0.0.1:5002/api/docs.
 
 ## 5. Security Recommendations(optional)
 
