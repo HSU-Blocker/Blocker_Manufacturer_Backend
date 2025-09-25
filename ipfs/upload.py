@@ -23,10 +23,10 @@ class IPFSUploader:
             ipfs_api = os.getenv("IPFS_API_URL", "/ip4/127.0.0.1/tcp/5001")
         try:
             self.client = ipfshttpclient.connect(ipfs_api)
-            logger.info(f"✅ IPFS 클라이언트 연결 성공: {ipfs_api}")
+            logger.info(f"IPFS 클라이언트 연결 성공: {ipfs_api}")
             self.ipfs_available = True
         except Exception as e:
-            logger.error(f"🚨 IPFS 클라이언트 연결 실패: {e}")
+            logger.error(f"IPFS 클라이언트 연결 실패: {e}")
             self.ipfs_available = False
 
     def upload_file(self, file_path):
@@ -36,7 +36,7 @@ class IPFSUploader:
         :return: {cid, file_name, sha3}
         """
         if not os.path.exists(file_path):
-            raise FileNotFoundError(f"⚠️ 파일을 찾을 수 없습니다: {file_path}")
+            raise FileNotFoundError(f"파일을 찾을 수 없습니다: {file_path}")
 
         try:
             if self.ipfs_available:
@@ -79,8 +79,8 @@ class IPFSUploader:
                 return {"cid": cid, "file_name": file_name,}
 
             else:
-                raise ConnectionError("🚨 IPFS 노드에 연결할 수 없습니다.")
+                raise ConnectionError("IPFS 노드에 연결할 수 없습니다.")
 
         except Exception as e:
-            logger.error(f"🚨 IPFS 업로드 중 오류 발생: {e}")
+            logger.error(f"IPFS 업로드 중 오류 발생: {e}")
             return None
