@@ -1,13 +1,10 @@
 from charm.toolbox.pairinggroup import PairingGroup, GT
-from charm.core.engine.util import objectToBytes, bytesToObject
 from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07
 import os
 import json
 import logging
 import pickle
-from base64 import b64encode, b64decode
-from hashlib import sha256
-import base64
+from base64 import b64encode
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

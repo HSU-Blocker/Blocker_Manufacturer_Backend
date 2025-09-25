@@ -4,8 +4,7 @@ import json
 import hashlib
 from ecdsa import SigningKey, VerifyingKey, NIST256p, BadSignatureError
 from charm.toolbox.pairinggroup import PairingGroup
-from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature, decode_dss_signature
-from ecdsa.util import number_to_string, sigdecode_string, sigencode_string
+from ecdsa.util import sigencode_string
 from web3 import Web3
 from eth_utils import keccak
 from eth_abi.packed import encode_packed
