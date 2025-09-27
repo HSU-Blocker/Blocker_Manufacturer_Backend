@@ -30,17 +30,11 @@ IPFS_API_URL=/dns/ipfs/tcp/5001/http
 ```
 
 ## 3. Run with Docker
-
-1. Build the Docker image
-
-```bash
-docker build -t blocker-manufacturer-backend .
-```
-
-2. Run with Docker Compose
+### Build and run the container
+Use the following command to build the Docker image and start the container in the background:
 
 ```bash
-docker compose up --build
+docker-compose up --build -d
 ```
 
 You can configure blockchain nodes, IPFS nodes, and other services in `docker-compose.yml` to connect to a test network if needed.
