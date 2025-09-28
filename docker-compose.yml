@@ -14,6 +14,8 @@ services:
     restart: unless-stopped
     networks:
       - app-network-manufacturer
+    volumes:
+      - ./crypto/keys:/app/crypto/keys
 
   ipfs:
     image: ipfs/kubo:latest
