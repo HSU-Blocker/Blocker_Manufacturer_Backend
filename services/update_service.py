@@ -80,15 +80,25 @@ class UpdateService:
         public_key_file = os.path.join(key_dir, "public_key.bin")
         master_key_file = os.path.join(key_dir, "master_key.bin")
 
+        # 공개키/마스터키 없으면 새로 생성
         if not (os.path.exists(public_key_file) and os.path.exists(master_key_file)):
+            os.makedirs(key_dir, exist_ok=True)  # [추가]
             cpabe.setup(public_key_file, master_key_file)
+            logger.info("CP-ABE 공개키/마스터키 새로 생성 완료")
 
-        # 속성 기반 키 생성
+        # 속성 기반 키 생성 or 로드
         user_attributes = UpdateService.extract_user_attributes(policy_dict)
         logger.info(f"추출된 user_attributes: {user_attributes}")
-        cpabe.generate_device_secret_key(
-            public_key_file, master_key_file, user_attributes, os.path.join(key_dir, "device_secret_key_file.bin")
-        )
+        
+        # # 디바이스 CP-ABE 비밀키 생성/로드
+        # if not os.path.exists(device_secret_key_file):  # [추가] 비밀키 없으면 새로 생성
+        #     device_secret_key = cpabe.generate_device_secret_key(
+        #         public_key_file, master_key_file, user_attributes, device_secret_key_file
+        #     )
+        #     logger.info("디바이스 비밀키 새로 생성 완료")
+        # else:
+        #     device_secret_key = cpabe.load_device_secret_key(device_secret_key_file)  # [추가] 기존 키 로드
+        #     logger.info("기존 디바이스 비밀키 로드 완료")
 
         # 대칭키 암호화
         encrypted_key = cpabe.encrypt(kbj, attribute_policy, public_key_file)
@@ -158,12 +168,22 @@ class UpdateService:
                 raise ValueError(f"'{key}' 속성은 필수입니다.")
 
         def parse_expression(expr: str) -> str:
-            expr = expr.strip().replace("AND", "and").replace("OR", "or")
-            return re.sub(r"\s+", " ", expr)
+            expr = expr.strip()
+            expr = expr.replace("AND", "and").replace("OR", "or")
+            expr = re.sub(r"\s+", " ", expr)  # 중복 공백 제거
+            return expr
 
-        expressions = [f"({parse_expression(v)})" for v in policy_dict.values() if v.strip()]
-        return " and ".join(expressions)
+        # 각 key-value를 개별 정책 문자열로 변환
+        expressions = []
+        for key, value in policy_dict.items():
+            if value.strip():  # 값이 비어있지 않은 경우만 처리
+                parsed = parse_expression(value)
+                expressions.append(f"({parsed})")
 
+        # 모든 조건을 and로 연결
+        full_policy = " and ".join(expressions)
+        return full_policy
+    
     @staticmethod
     def extract_user_attributes(policy_dict):
         """
@@ -173,8 +193,9 @@ class UpdateService:
         for value in policy_dict.values():
             if not isinstance(value, str) or not value.strip():
                 continue
+            # AND, OR 제거, 괄호 제거 후 분할
             expr = value.upper().replace("AND", " ").replace("OR", " ")
-            expr = re.sub(r"[()]", " ", expr)
-            tokens = [t.strip() for t in expr.split() if t.strip()]
+            expr = re.sub(r"[()]", " ", expr)  # 괄호 제거
+            tokens = [token.strip() for token in expr.split() if token.strip()]
             attributes.extend(tokens)
         return list(set(attributes))  # 중복 제거
