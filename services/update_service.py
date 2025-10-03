@@ -155,9 +155,9 @@ class UpdateService:
                 "signature": base64.b64encode(signature).decode(),
             }
         except Exception as e:
-            # [추가] 리버트/가스/잔액 등 상세 사유를 그대로 전달
+            # [보안] 상세 사유는 서버 로그에만 남기고 클라이언트에는 일반 메시지 전송
             logger.exception("블록체인 등록 실패")
-            return jsonify({"error": f"Blockchain register_update failed: {str(e)}"}), 500
+            return jsonify({"error": "Blockchain register_update failed"}), 500
 
     @staticmethod
     def build_attribute_policy(policy_dict):
