@@ -31,8 +31,9 @@ It also includes third-party libraries distributed under the following licenses:
 ---
 
 License Texts:
-Full license texts of the above third-party libraries are included in the LICENSES/ directory of this distribution.  
-For dependencies under Apache-2.0, BSD, HPND, Python-2.0, or OFL-1.1, the complete license text is included as required.
+- Full license texts of the above third-party libraries are included in the LICENSES/ directory.  
+- For dependencies under **Apache-2.0, BSD-2-Clause, BSD-3-Clause, HPND, Python-2.0, and OFL-1.1**, the complete license text is included as required by their terms.  
+- For Creative Commons (CC-BY), Unlicense, and Public Domain works, attribution and public domain notices are preserved in LICENSES/.  
 
 ---
 
