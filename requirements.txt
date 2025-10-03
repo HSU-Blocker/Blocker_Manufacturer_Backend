@@ -24,7 +24,7 @@ pytest==7.0.0
 pytest-cov==3.0.0
 
 # HTTP & Utils
-requests==2.27.1
+requests==2.32.4
 uuid==1.30
 eth-account>=0.5.9
 eth-keys>=0.4.0
