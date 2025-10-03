@@ -28,11 +28,13 @@ It also includes third-party libraries distributed under the following licenses:
 - websockets 10.4 (BSD-3-Clause)
 - werkzeug 3.0.6 (BSD-3-Clause, CC-BY-2.5, CC-BY-3.0)
 
-For the full license texts of these libraries, please refer to their official repositories or package distributions.
+---
+
+License Texts:
+Full license texts of the above third-party libraries are included in the LICENSES/ directory of this distribution.  
+For dependencies under Apache-2.0, BSD, HPND, Python-2.0, or OFL-1.1, the complete license text is included as required.
 
 ---
 
 Trademark Notice:
 The Flask name and logo are trademarks or registered trademarks of the Pallets Project.
-
-Full license texts of third-party dependencies are provided in the LICENSES/ directory.
