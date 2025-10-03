@@ -1,6 +1,6 @@
 # Flask & Extensions
 flask==2.2.5
-werkzeug==2.2.3
+werkzeug==3.0.6
 python-dotenv==0.19.1
 flask-cors==5.0.0
 flask_socketio==5.0.1
