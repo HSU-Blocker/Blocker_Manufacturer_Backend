@@ -1,6 +1,7 @@
 NOTICE
 
 This project (Blocker_Manufacturer_Backend) is licensed under the MIT License.
+See the LICENSE file for the full text.
 
 It also includes third-party libraries distributed under the following licenses:
 
@@ -29,8 +30,7 @@ It also includes third-party libraries distributed under the following licenses:
 
 For the full license texts of these libraries, please refer to their official repositories or package distributions.
 
-
 ---
 
 Trademark Notice:
-The Flask name and logo are trademarks of the Pallets Project.
+The Flask name and logo are trademarks or registered trademarks of the Pallets Project.
