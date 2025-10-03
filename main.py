@@ -7,4 +7,5 @@ CORS(app)
 app.register_blueprint(api_bp)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    # 디버그 모드 비활성화
+    app.run(host="0.0.0.0", port=5002)
