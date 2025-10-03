@@ -73,7 +73,7 @@ class UpdateService:
             logger.info(f"IPFS 업로드 완료: CID={ipfs_hash}, 파일명={file_name}")
         except Exception as e:
             logger.error(f"IPFS 업로드 실패: {e}")
-            return jsonify({"error": f"IPFS 업로드 실패: {e}"}), 500
+            return jsonify({"error": "IPFS 업로드에 실패했습니다. 관리자에게 문의하세요."}), 500
 
         # CP-ABE 키 생성
         key_dir = os.path.join(os.path.dirname(__file__), "../crypto/keys")
