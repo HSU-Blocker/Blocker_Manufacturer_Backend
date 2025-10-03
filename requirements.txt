@@ -16,7 +16,7 @@ websockets>=10.4
 ipfshttpclient==0.8.0a2
 
 # Cryptography
-cryptography==42.0.0
+cryptography==44.0.1
 pycryptodome==3.19.1
 
 # Testing
