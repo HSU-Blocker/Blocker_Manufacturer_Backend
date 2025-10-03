@@ -1,8 +1,11 @@
-Pallets Flask Logo License
+Copyright 2010 Pallets
 
-The Flask logo is a trademark of the Pallets Project.
-- You may use the logo to identify Flask or to link to the official website.
-- You may not modify the logo or use it in a way that suggests endorsement by the Pallets Project without permission.
-- All other rights reserved by the Pallets Project.
+This logo or a modified version may be used by anyone to refer to the Flask project,
+but does not indicate endorsement by the Pallets project.
 
-Source: https://flask.palletsprojects.com/en/latest/logo/
+Redistribution and use in source (SVG) and binary (rendered PNG) forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice and this list of conditions.
+2. Redistributions in binary form must reproduce the above copyright notice and this list of conditions
+   in the documentation and/or other materials provided with the distribution.
