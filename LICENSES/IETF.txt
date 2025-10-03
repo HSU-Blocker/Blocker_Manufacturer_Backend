@@ -1,9 +1,0 @@
-IETF Contribution Agreement
-
-By submitting a contribution to the IETF, I agree that:
-- Any contribution to the IETF intended for publication shall be considered “made available” for use by the IETF.
-- I grant the IETF and its participants a perpetual, irrevocable, non-exclusive, royalty-free license to use, copy, 
-  publish, and distribute my contribution, in whole or in part, as part of the IETF standards process.
-- I retain all other intellectual property rights in my contribution.
-
-Source: https://www.ietf.org/ipr/policy/
