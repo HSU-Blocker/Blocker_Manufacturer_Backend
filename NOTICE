@@ -4,6 +4,7 @@ This project (Blocker_Manufacturer_Backend) is licensed under the MIT License.
 
 It also includes third-party libraries distributed under the following licenses:
 
+- Flask Logo (Pallets Flask Logo License, Trademark belongs to Pallets Project)
 - cryptography 44.0.1 (Apache-2.0, BSD-3-Clause, IETF)
 - eth-abi 3.0.0 (MIT)
 - eth-account 0.5.9 (MIT)
@@ -26,7 +27,5 @@ It also includes third-party libraries distributed under the following licenses:
 - web3 7.9.0 (MIT)
 - websockets 10.4 (BSD-3-Clause)
 - werkzeug 3.0.6 (BSD-3-Clause, CC-BY-2.5, CC-BY-3.0)
-- Flask Logo (Pallets Flask Logo License)
-  Trademark belongs to Pallets Project.
 
 For the full license texts of these libraries, please refer to their official repositories or package distributions.
