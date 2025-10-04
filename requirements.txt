@@ -21,7 +21,7 @@ pycryptodome==3.19.1
 
 # Testing
 pytest==7.0.0
-pytest-cov==3.0.0   # ==3.0.0 -> =5.0.0 의존성 문제 해결
+pytest-cov==5.0.0   # ==3.0.0 -> =5.0.0 의존성 문제 해결
 
 # HTTP & Utils
 requests==2.32.4
