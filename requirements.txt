@@ -28,7 +28,7 @@ requests==2.32.4
 uuid==1.30
 eth-account>=0.5.9
 eth-keys>=0.4.0
-eth-utils=5.1.0  # >=2.0.0 -> =5.1.0 의존성 문제 해결
+eth-utils==5.1.0  # >=2.0.0 -> =5.1.0 의존성 문제 해결
 eth-abi>=3.0.0
 
 # Deployment
