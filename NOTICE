@@ -1,0 +1,37 @@
+NOTICE
+
+This project (Blocker_Manufacturer_Backend) is licensed under the MIT License.
+See the LICENSE file for the full text.
+
+It also includes third-party libraries and assets distributed under the following licenses:
+
+- Apache License 2.0
+- BSD 2-Clause "Simplified" License
+- BSD 3-Clause "New" or "Revised" License
+- Creative Commons Attribution 2.5
+- Creative Commons Attribution 3.0
+- Creative Commons Zero v1.0 Universal
+- Historical Permission Notice and Disclaimer (HPND)
+- MIT License
+- SIL Open Font License 1.1
+- Python Software License Agreement 2.0 (PSF-2.0)
+- Python License 2.0
+- Public Domain
+- The Unlicense
+- IETF Contribution Agreement
+- Pallets Flask Logo License (applies only to the Flask logo artwork, which this project does not use)
+
+---
+
+License Texts:
+- Full license texts for the above licenses are provided in the `LICENSES/` directory of this distribution.  
+- For **Apache-2.0, BSD (2-Clause / 3-Clause), HPND, Python-2.0, PSF-2.0, OFL-1.1**, the complete license texts are included as required.  
+- For **Creative Commons (CC-BY-2.5, CC-BY-3.0, CC0-1.0)**, attribution and disclaimers are preserved in LICENSES/.  
+- For **Unlicense** and **Public Domain**, notices are preserved in LICENSES/.  
+- For the **IETF Contribution Agreement**, attribution notice is preserved in LICENSES/.  
+- For the **Pallets Flask Logo License**, the license applies only to the Flask logo artwork, which this project does not use.
+
+---
+
+Trademark Notice:
+The Flask name and logo are trademarks or registered trademarks of the Pallets Project.

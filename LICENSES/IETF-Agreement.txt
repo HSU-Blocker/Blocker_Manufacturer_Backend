@@ -1,0 +1,19 @@
+IETF CONTRIBUTION AGREEMENT
+
+By submitting a Contribution to the IETF, each Contributor agrees to the following terms and conditions:
+
+1. The Contributor grants to the IETF Trust a perpetual, irrevocable, non-exclusive, royalty-free, worldwide, sublicensable license to use, reproduce, publish, modify, translate, distribute, and display the Contribution, in whole or in part, in any medium, whether now known or later developed.
+
+2. The Contributor grants to the IETF Trust the right to prepare derivative works that are based on or incorporate all or part of the Contribution, and to authorize others to do so.
+
+3. The Contributor represents that they are legally entitled to make the Contribution and grant the rights described above.
+
+4. If the Contribution is made in the course of employment, or is based on work done in the course of employment, the Contributor represents that they have received permission to make the Contribution and to grant the rights described above on behalf of their employer.
+
+5. The Contributor represents that the Contribution does not violate any third-party rights, including intellectual property rights.
+
+6. The IETF Trust agrees to make Contributions available under terms consistent with the IETF's mission of open standards development.
+
+DISCLAIMER
+
+THE CONTRIBUTION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT OF THIRD-PARTY RIGHTS.

@@ -21,14 +21,14 @@ pycryptodome==3.19.1
 
 # Testing
 pytest==7.0.0
-pytest-cov==3.0.0
+pytest-cov==5.0.0   # ==3.0.0 -> =5.0.0 의존성 문제 해결
 
 # HTTP & Utils
 requests==2.32.4
 uuid==1.30
 eth-account>=0.5.9
 eth-keys>=0.4.0
-eth-utils>=2.0.0
+eth-utils==5.1.0  # >=2.0.0 -> =5.1.0 의존성 문제 해결
 eth-abi>=3.0.0
 
 # Deployment
