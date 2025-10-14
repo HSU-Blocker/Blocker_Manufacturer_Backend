@@ -3,11 +3,8 @@
 This document provides step-by-step instructions to set up and run the project in a local development environment or inside containers.
 
 ## 1. System Requirements
-
-- Operating system: macOS, Linux, Windows (WSL recommended)
-- Python 3.10 or newer
-- Docker & Docker Compose (for containerized runs)
-- Internet connection (for package installation and IPFS/blockchain access)
+- **Docker** and **Docker Compose** installed  
+- **Git** installed  
 
 ## 2. Local Development Setup
 
