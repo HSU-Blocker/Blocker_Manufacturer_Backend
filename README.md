@@ -22,7 +22,7 @@ This repository implements the manufacturer backend of a blockchain-based secure
 
 ## Technology Stack
 
-- ![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FHSU-Blocker%2FBlocker_Manufacturer_Backend.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FHSU-Blocker%2FBlocker_Manufacturer_Backend?ref=badge_shield)
+- ![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)
  Web framework used for the backend API and admin endpoints (imports in `main.py` and `api/routes.py`).
 
 - ![Flask-RESTX](https://img.shields.io/badge/Flask--RESTX-007ACC?style=flat&logo=python&logoColor=white)  API documentation and request parsing (used in `api/routes.py`).
