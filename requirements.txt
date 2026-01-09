@@ -1,6 +1,6 @@
 # Flask & Extensions
 flask==2.2.5
-werkzeug==3.0.6
+werkzeug==3.1.5
 python-dotenv==0.19.1
 flask-cors==6.0.0
 # flask_socketio==5.0.1 # -> 10.13 미사용된 라이브러리 제거
